@@ -689,3 +689,376 @@ function resolveClassicG1() {
     horse.g1Winner = true;
     if (horse.sex === "牝") {
       horse.shukaHeroine = true;
+      horse.umabashira.push("【3歳牝馬G1 1着】");
+      horse.history.push("3歳牝馬G1（オークス・秋華賞）を制覇");
+    } else {
+      horse.umabashira.push("【クラシックG1 1着】");
+      horse.history.push("3歳クラシックG1を制覇");
+    }
+    horse.grade = "JRA G1ウィナー";
+    updateDashboard();
+    showCard(
+      "3歳 秋（G1制覇！）",
+      horse.sex === "牝" ? "ターフに咲いた大輪の華！3歳牝馬G1制覇！！" : "世代8,000頭の頂点！クラシックG1制覇！！",
+      "最後の直線、外から豪快に突き抜けて先頭でゴール板を駆け抜けました！スタンドを埋め尽くす大観衆から拍手と歓声が巻き起こり、あなたの名前は競馬史に永遠に刻まれました！",
+      "実況：「外から一気に突き抜けたーっ！世代の頂点に立ったのは『" + horse.name + "』だーっ！！」",
+      "G1タイトルを手にできる競走馬は、同世代8,000頭のうちわずか0.2%〜0.3%の選ばれし存在です。",
+      [{ label: "4歳〜5歳：古馬王道路線へ進む", action: stepOlderJra }]
+    );
+  } else {
+    horse.seconds += 1;
+    horse.prize += 5200;
+    horse.umabashira.push(horse.sex === "牝" ? "【3歳牝馬G1 2着】" : "【クラシックG1 2着】");
+    horse.history.push("3歳G1でクビ差の2着に激走");
+    updateDashboard();
+    showCard(
+      "3歳 秋（G1激走2着）",
+      "大舞台でクビ差の2着！世代トップクラスの力を証明",
+      "勝ち馬にはあと一歩届かなかったものの、G1の大舞台で堂々の2着に激走！多くの競馬ファンの記憶に残る名勝負を演じました。",
+      "騎手：「悔しいけれど、本当に最後までよく詰め寄ってくれた。古馬になったら必ずビッグタイトルを獲れる馬です」",
+      "G1で連対（2着以内）に入るだけでも、世代上位0.5%に入る超エリートです。",
+      [{ label: "4歳〜5歳：古馬戦線へ進む", action: stepOlderJra }]
+    );
+  }
+}
+
+function stepTransferToLocal() {
+  horse.affiliation = "地方競馬（園田・高知・南関）";
+  horse.grade = "地方C2クラス";
+  horse.history.push("3歳秋にJRA未勝利から地方競馬へ転厩");
+  updateDashboard();
+  stepLocalCareer();
+}
+
+function stepLocalCareer() {
+  if (horse.ability >= 63 && prob(45)) {
+    horse.runs += 8;
+    horse.wins += 5;
+    horse.seconds += 2;
+    horse.prize += 2400;
+    horse.affiliation = "JRA再転入 / 地方交流戦線";
+    horse.grade = "JRA 2勝クラス（中央復帰）";
+    horse.umabashira.push("[地方C2 1着]", "[地方C1 1着]", "[地方B級 1着]", "[JRA再転入 1着]");
+    horse.history.push("地方で連勝を果たしJRAへ再転入（中央復帰）");
+    updateDashboard();
+    showCard(
+      "4歳〜5歳",
+      "地方の砂で完全覚醒！破竹の連勝でJRAへ奇跡の再転入！",
+      "地方競馬の水がピタリと合い、圧倒的なスピードで連勝街道を驀進！その実績を引っ提げて再びJRA（中央競馬）へ復帰し、見事に勝利を挙げました！",
+      "調教師：「地方で自信をつけて別馬のようにたくましくなった。見事なサクセスストーリーだよ」",
+      "3歳未勝利で地方へ移籍した馬のうち、連勝条件を満たしてJRAへ再転入を果たす馬も毎年存在します。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+    return;
+  }
+
+  if (horse.legs === "やや繊細" && prob(35)) {
+    horse.runs += 12;
+    horse.wins += 2;
+    horse.seconds += 3;
+    horse.prize += 680;
+    horse.umabashira.push("[地方戦 1着]", "[地方戦 2着]", "[地方戦 1着(故障)]");
+    horse.history.push("地方で2勝を挙げるも屈腱炎を発症し引退");
+    updateDashboard();
+    showCard(
+      "4歳 冬",
+      "地方で2勝を挙げるも…無念の「浅屈腱炎」発症",
+      "地方のダートで懸命に走り2勝を挙げましたが、レース翌日に脚元に熱感と腫れが見つかり、不治の病とも呼ばれる『屈腱炎（エビ）』が判明しました。",
+      "調教師：「ここまで一生懸命走って馬主孝行をしてくれた。これ以上無理はさせられない、ゆっくり休ませよう」",
+      "脚元の故障は競走馬がターフを去る最大の要因のひとつです。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+    return;
+  }
+
+  horse.runs += 68;
+  horse.wins += 6;
+  horse.seconds += 14;
+  horse.prize += 1650;
+  horse.localIron = true;
+  horse.grade = "地方B級（地方の鉄人）";
+  horse.umabashira.push("[高知C3 1着]", "[園田C1 2着]", "[地方戦 1着]", "[通算70戦完走]");
+  horse.history.push("大きな怪我なく地方で70戦以上をタフに走り抜く");
+  updateDashboard();
+  showCard(
+    "4歳〜7歳",
+    "雨の日も風の日も…地方のダートを70戦以上走り抜いた『地方の鉄人』！",
+    "派手なG1タイトルこそありませんでしたが、生まれつきの丈夫な体質を武器に、中2週のローテーションで70戦以上を一度も休まず完走！地元の競馬ファンから熱狂的に愛される名物馬となりました。",
+    "厩務員：「本当に頭が下がるくらいタフで真面目な馬だよ。10年間で一番の功労馬だ」",
+    "地方競馬では、徹底したケアのもとで通算70戦〜100戦以上を元気に走り抜く鉄人ホースが存在します。",
+    [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+  );
+}
+
+function stepJumpCareer() {
+  horse.affiliation = "JRA（障害競走路線）";
+  horse.runs += 10;
+  if (prob(55) || horse.ability >= 62) {
+    horse.wins += 4;
+    horse.seconds += 3;
+    horse.prize += 9800;
+    horse.jumpKing = true;
+    horse.grade = "JRA 障害J-G1王者";
+    horse.umabashira.push("[障害未勝利 1着]", "[障害OP 1着]", "【中山大障害(J-G1) 1着】");
+    horse.history.push("障害レースへ転向し、中山大障害(J-G1)を制覇");
+    updateDashboard();
+    showCard(
+      "4歳〜6歳（中山大障害 J-G1）",
+      "平地の挫折から大逆転！大竹柵を越えて『中山大障害（J-G1）』制覇！！",
+      "平地では勝てなかったものの、障害飛越の天性のセンスが開花！ついに高さ1.6mの大竹柵・大生垣を越える過酷な4100m戦【中山大障害（J-G1）】を制し、障害界の絶対王者に君臨しました！",
+      "障害騎手：「飛越がとにかく丁寧で着地がぶれない。人馬一体で勝ち取った最高のJ-G1タイトルです！」",
+      "平地で苦戦した馬が障害レースで才能を開花させ、長年にわたり活躍するドラマは競馬の大きな魅力です。",
+      [{ label: "栄光の引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  } else {
+    horse.wins += 1;
+    horse.seconds += 2;
+    horse.prize += 2100;
+    horse.grade = "JRA 障害オープン";
+    horse.umabashira.push("[障害未勝利 2着]", "[障害未勝利 1着]", "[障害OP 4着]");
+    horse.history.push("障害レースへ転向し1勝を挙げる");
+    updateDashboard();
+    showCard(
+      "4歳〜5歳",
+      "ハードルを越えて！障害未勝利戦で見事な勝利",
+      "厳しい飛越練習を重ね、障害レースで見事に勝利を掴み取りました！しかもこの「障害飛越の経験」が、引退後のセカンドキャリアで大きな武器になります。",
+      "調教師：「真面目に飛越をこなしてくれた。この経験があれば、引退後も馬術競技馬として引く手あまただろう」",
+      "障害競走を経験した馬は、引退後に障害馬術競技馬としての高い適性を持つことが知られています。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  }
+}
+
+function stepOlderJra() {
+  if (prob(32)) {
+    horse.runs += 4;
+    horse.wins += 1;
+    horse.prize += 2200;
+    horse.umabashira.push("[古馬戦 1着]", "[特別戦 3着(屈腱炎発症)]");
+    updateDashboard();
+    showCard(
+      "4歳 秋",
+      "競走馬最大の試練…「浅屈腱炎（エビ）」を発症",
+      "順調にキャリアを重ねていた矢先、前脚の腱に損傷が見つかりました。復帰には福島県いわき市の「馬の温泉（競走馬リハビリテーションセンター）」を含む1年以上の長期休養が必要です。",
+      "調教師：「時間はかかるが、馬の温泉でじっくりケアすればもう一度ターフに戻れる可能性がある。どうする？」",
+      "JRAの競走馬リハビリテーションセンター（通称：馬の温泉）では、温泉療法やウォータートレッドミルによる復帰支援が行われています。",
+      [
+        { label: "【決断】1年半の「馬の温泉」リハビリを経て奇跡の復活を目指す", isChoice: true, action: stepOnsenComeback },
+        { label: "【決断】脚元を悪化させないよう、ここで現役を引退する", isChoice: true, action: stepRetirement }
+      ]
+    );
+    return;
+  }
+
+  if (horse.ability >= 74 && prob(55)) {
+    horse.runs += 12;
+    horse.wins += 4;
+    horse.seconds += 3;
+    horse.prize += 14500;
+    horse.grade = horse.g1Winner ? "JRA G1ウィナー" : "JRA 重賞ウィナー";
+    horse.umabashira.push("[3勝クラス 1着]", "[オープン特別 1着]", "【G2重賞 1着】");
+    horse.history.push("古馬重賞戦線でタイトルを獲得");
+    updateDashboard();
+    showCard(
+      "4歳〜6歳",
+      "充実の古馬時代！重賞タイトルを制してターフの主役へ！",
+      "古馬になってさらに馬体が充実！厳しい重賞戦線で堂々と先頭を駆け抜け、1億円を超える賞金を稼ぎ出す名馬となりました。",
+      "騎手：「毎年力をつけてくれて、本当に頼もしいパートナーでした！」",
+      "JRAで重賞を勝てる馬は、世代8,000頭のうち上位約1%のみです。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  } else {
+    horse.runs += 16;
+    horse.wins += 2;
+    horse.seconds += 4;
+    horse.prize += 4600;
+    horse.grade = "JRA 2勝〜3勝クラス";
+    horse.umabashira.push("[1勝クラス 1着]", "[2勝クラス 2着]", "[2勝クラス 1着]", "[3勝クラス 4着]");
+    horse.history.push("JRA条件戦線で堅実に活躍");
+    updateDashboard();
+    showCard(
+      "4歳〜6歳",
+      "JRA条件戦線の名バイプレイヤーとして活躍",
+      "重賞には届かなかったものの、JRAの2勝・3勝クラスで長く安定した走りを見せ、関係者とファンに愛される競走生活を送りました。",
+      "調教師：「どんな相手でも自分の力は必ず出し切る、本当にエライ馬だったよ」",
+      "JRAで2勝以上を挙げられる馬は、世代全体の上位約15%〜20%です。",
+      [
+        { label: "このまま平地で現役を引退し、セカンドキャリアへ", action: stepRetirement },
+        { label: "【挑戦】新境地を求めて「障害レース」へ転向する", isChoice: true, action: stepJumpCareer }
+      ]
+    );
+  }
+}
+
+function stepOnsenComeback() {
+  horse.runs += 3;
+  horse.onsenReturn = true;
+  if (prob(60)) {
+    horse.wins += 1;
+    horse.prize += 3800;
+    horse.umabashira.push("[休養500日(馬の温泉)]", "【復帰戦 1着(涙の勝利)】");
+    horse.history.push("1年半の温泉リハビリから復活勝利を挙げる");
+    updateDashboard();
+    showCard(
+      "6歳 春",
+      "500日ぶりのターフ…涙の復活勝利！！",
+      "「馬の温泉」での長いリハビリとスタッフの献身的なケアを乗り越え、500日ぶりの復帰戦で見事に1着でゴール！ウイニングランでは厩務員も騎手も涙を拭っていました。",
+      "厩務員：「よく無事に帰ってきてくれた…！今日という日を迎えられて本当に感無量です」",
+      "屈腱炎からの復帰勝利は再発リスクとの戦いであり、ホースマンにとって最も感動的な瞬間のひとつです。",
+      [{ label: "無事に引退・セカンドキャリアへ", action: stepRetirement }]
+    );
+  } else {
+    horse.seconds += 1;
+    horse.prize += 1100;
+    horse.umabashira.push("[休養450日(馬の温泉)]", "[復帰戦 2着]");
+    horse.history.push("長期休養から復帰し完走を果たす");
+    updateDashboard();
+    showCard(
+      "6歳 春",
+      "長いリハビリを乗り越え、無事にターフへ帰還！",
+      "1年以上の休養を経て再びレースに出走し、2着と好走！脚元が温存されているうちに、胸を張って第二の馬生へと進むことになりました。",
+      "調教師：「無事にゴール板を駆け抜けてくれただけで100点満点だ。いい余生を用意してやろう」",
+      "怪我から復帰して無事に引退できることは、セカンドキャリアの選択肢を広げる上でも重要です。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  }
+}
+
+function stepRetirement() {
+  let alias = "";
+  let jraDest = "";
+  let careerDesc = "";
+  let rarityText = "";
+
+  if (horse.shukaHeroine) {
+    alias = "ターフに咲いた3歳牝馬のヒロイン";
+    jraDest = "北海道の故郷牧場にて繁殖牝馬となる予定";
+    careerDesc = "3歳牝馬G1を制した歴史的名牝として故郷の牧場へ凱旋！広大な放牧地で仲間と過ごしながら、次世代のG1馬を産む偉大な母としての余生を歩んでいます。";
+    rarityText = "到達レアリティ：上位 0.2%（世代4,000頭の牝馬の頂点）";
+  } else if (horse.jumpKing) {
+    alias = "大竹柵を越えた不屈の絶対王者";
+    jraDest = "JRA競馬場にて誘導馬、または乗馬となる予定";
+    careerDesc = "平地の挫折から中山大障害（J-G1）制覇まで登り詰めた不屈のヒーロー！引退後はその知名度と落ち着いた飛越センスを活かし、競馬場の看板誘導馬として多くのファンに囲まれています。";
+    rarityText = "到達レアリティ：上位 0.1%（障害J-G1ウィナー）";
+  } else if (horse.g1Winner && horse.sex === "牡") {
+    alias = "血を未来へ繋ぐターフの覇王";
+    jraDest = "北海道のスタッドにて種牡馬となる予定";
+    careerDesc = "世代8,000頭の頂点に立ち、堂々の種牡馬入り！毎年多くの繁殖牝馬を集める人気種牡馬として、自分の産駒がデビューする日を待っています。";
+    rarityText = "到達レアリティ：上位 0.3%（選ばれし種牡馬ルート）";
+  } else if (horse.affiliation.includes("障害")) {
+    alias = "華麗なる馬術界のエリートジャンパー";
+    jraDest = "乗馬クラブ（馬術競技連盟登録）にて競技馬となる予定";
+    careerDesc = "現役時代に培った障害飛越のテクニックが高く評価され、引退後はなんと【障害馬術競技馬】へ華麗に転身！全国大会を目指すパートナーとして大活躍しています。";
+    rarityText = "到達レアリティ：上位 2.5%（障害競走経験馬ならではの特権ルート）";
+  } else if ((horse.coat.includes("芦毛") || horse.coat.includes("白毛") || horse.coat.includes("尾花栗毛") || horse.gelded || horse.temperament.includes("大人しい") || horse.temperament.includes("穏やか")) && !horse.temperament.includes("激しい") && prob(65)) {
+    alias = horse.highPrice && horse.wins <= 1 ? "1億8,000万円の高貴なる誘導馬" : "ターフを導く白き騎士（JRA誘導馬）";
+    jraDest = "JRA 東京・京都競馬場にて誘導馬となる予定";
+    careerDesc = `その美しい【${horse.coat}】の馬体と、「${horse.temperament}」という穏やかな性格がJRA職員の目に留まり、競馬場の【誘導馬】に大抜擢されました！G1のファンファーレを背に、後輩たちを安全にターフへと導いています。`;
+    rarityText = "到達レアリティ：上位 1.2%（気性の良さと見栄えで掴んだ最高のセカンドキャリア）";
+  } else if (horse.onsenReturn) {
+    alias = "不屈の温泉帰り・奇跡の復活馬";
+    jraDest = "観光牧場・引退馬支援牧場にて功労馬となる予定";
+    careerDesc = "屈腱炎と500日の「馬の温泉」リハビリを乗り越えた感動のストーリーが多くのファンの心を打ち、引退後は観光牧場の功労馬として大切に繋養されています。";
+    rarityText = "到達レアリティ：上位 3.0%（大怪我を乗り越えた感動ルート）";
+  } else if (horse.localIron) {
+    alias = "砂塵を70戦駆け抜けた地方の鉄人";
+    jraDest = "地方の乗馬クラブにて乗馬（功労馬）となる予定";
+    careerDesc = "大きな怪我ひとつなく70戦以上を走り抜いたタフさと真面目さが買われ、地元の乗馬クラブへ引き取られました。毎日たくさんのニンジンをもらって穏やかに暮らしています。";
+    rarityText = "到達レアリティ：上位 4.5%（無傷で走り抜いた馬主孝行の鉄人）";
+  } else if (horse.sex === "牝" && (horse.wins >= 1 || horse.highPrice)) {
+    alias = "北の大地へ帰還した良血の母";
+    jraDest = "北海道の生産牧場にて繁殖牝馬となる予定";
+    careerDesc = "現役生活を終え、生まれ故郷の北海道へ帰還して繁殖牝馬となりました。自分が叶えられなかった夢を仔馬に託し、穏やかな牧場生活を送っています。";
+    rarityText = "到達レアリティ：上位 15%（牝馬の繁殖入りルート）";
+  } else if (!horse.temperament.includes("激しい") || prob(55)) {
+    alias = horse.highPrice && horse.wins === 0 ? "1億8,000万円の超高級乗馬" : "子供たちに愛される乗馬クラブの先生";
+    jraDest = "全国の乗馬クラブ・ふれあい牧場にて乗馬となる予定";
+    careerDesc = "引退馬リトレーニングを経て、乗馬クラブの「先生」として第二の馬生をスタート！初心者や子供たちを背中に乗せて優しく歩く人気者として、幸せな余生を送っています。";
+    rarityText = "到達レアリティ：上位 35%（穏やかな気性が繋いだ安全なセカンドキャリア）";
+  } else {
+    alias = "ターフを去った名もなき疾風";
+    jraDest = "乗馬（登録抹消・用途変更）";
+    careerDesc = "競走馬登録を抹消された後、公式発表には「乗馬」と記されましたが、気性の激しさなどから引き取り手が見つからず、その後の詳しい消息は分からなくなりました……。<br><br>これが年間8,000頭が生まれるサラブレッドの統計の、もうひとつの現実です。現在、1頭でも多くの引退馬がセカンドキャリアへ進めるよう、引退馬支援団体によるリトレーニング活動が広がっています。";
+    rarityText = "統計の現実：毎年引退する約5,000頭のうち、多くの馬が厳しい余生の壁に直面します。";
+  }
+
+  horse.grade = "現役引退";
+  updateDashboard();
+
+  const umabashiraStr = horse.umabashira.join(" → ") || "[未出走]";
+  const historyList = horse.history.map(h => `<li>${h}</li>`).join("");
+
+  const shareText = `【競走馬に産まれる人生】
+馬名：${horse.name}（${horse.sex}・${horse.coat}）
+称号：『${alias}』
+戦績：${horse.runs}戦${horse.wins}勝（獲得賞金 ${horse.prize.toLocaleString()}万円）
+軌跡：${umabashiraStr}
+進路：${jraDest}
+#競走馬に産まれる人生 #1in8000 #競馬`;
+
+  const pageUrl = window.location.href.startsWith("http") ? window.location.href : "https://yuta-ailife.github.io/1in8000-horse/";
+  const xIntentUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText + "\n" + pageUrl)}`;
+
+  const resultHtml = `
+    <div class="result-card">
+      <div class="alias-label">▼ 獲得した二つ名（称号）</div>
+      <div class="title-badge">『${alias}』</div>
+
+      <div class="jra-notice">
+        <b>【競走馬登録抹消のお知らせ（風）】</b><br>
+        ${horse.name}号（${horse.sex}・父：${horse.sire}）は、競走馬登録を抹消いたしました。<br>
+        <b>■ 今後の進路：</b>${jraDest}
+      </div>
+
+      <div class="umabashira-box">
+        <b>■ 主な馬柱（戦績ログ）：</b><br>
+        ${umabashiraStr}
+      </div>
+
+      <p style="font-size:0.92rem; line-height:1.7;">${careerDesc}</p>
+
+      <div style="font-size:0.84rem; color:#cfe0d8; border-top:1px solid #16462e; padding-top:10px;">
+        <b>■ 歩んだ馬生の記録：</b>
+        <ul style="margin:6px 0 8px 0; padding-left:20px;">${historyList || "<li>ターフを懸命に駆け抜けた</li>"}</ul>
+        <b>■ 最終通算戦績：</b> ${horse.runs}戦 ${horse.wins}勝（2着${horse.seconds}回） / 総獲得賞金：${horse.prize.toLocaleString()}万円
+      </div>
+    </div>
+  `;
+
+  showCard(
+    "馬生の結末",
+    `「${horse.name}」の競走馬としての生涯が幕を閉じました`,
+    resultHtml,
+    null,
+    rarityText,
+    [
+      {
+        label: "🐦 X（旧Twitter）でこの馬生と称号をポストする",
+        isLink: true,
+        href: xIntentUrl,
+        onClick: () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText + "\n" + pageUrl).catch(() => {});
+          }
+        }
+      },
+      {
+        label: "📋 戦績テキストをクリップボードにコピーする",
+        isChoice: true,
+        action: () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText + "\n" + pageUrl);
+            alert("戦績テキストとURLをコピーしました！Xに貼り付けて投稿できます。");
+          }
+        }
+      },
+      {
+        label: "🔄 もう一度、別の馬として生まれ変わる（1/8000ガチャ）",
+        action: startGame
+      }
+    ]
+  );
+}
+</script>
+</body>
+</html>
