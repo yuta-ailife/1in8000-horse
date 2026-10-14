@@ -1,1242 +1,993 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1 in 8,000 — 競走馬に産まれる人生</title>
-  <meta name="description" content="年間約8,000頭生まれるサラブレッド。日本ダービーや秋華賞のゲートに入れるのはわずか0.2%。血統・気性難・怪我・地方転厩・誘導馬など統計データで歩む競走馬の生涯シミュレーター。" />
-  <meta property="og:title" content="1 in 8,000 — 競走馬に産まれる人生" />
-  <meta property="og:description" content="年間生産8,000頭のリアル統計シミュレーター。気性難での去勢、未勝利からの地方転厩、秋華賞・G1制覇、そして誘導馬や乗馬へのセカンドキャリア。あなたの馬はどんな一生を歩むのか？" />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="🐎 1 in 8,000 — 競走馬に産まれる人生" />
-  <meta name="twitter:description" content="年間約8,000頭のサラブレッド統計シミュレーター。血統・気性難・怪我・地方転厩・秋華賞、そして引退後のセカンドキャリアまでを体験しよう。" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Serif+JP:wght@700;900&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-      background: radial-gradient(circle at top, #132a1e 0%, #09130e 65%, #050a07 100%);
-      color: #ecfdf5;
-      min-height: 100vh;
-    }
-    .serif-title {
-      font-family: 'Noto Serif JP', serif;
-    }
-    .gold-text {
-      background: linear-gradient(135deg, #fde68a 0%, #f59e0b 50%, #fbbf24 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .gold-border {
-      border-color: rgba(245, 158, 11, 0.55);
-    }
-    .turf-card {
-      background: rgba(14, 29, 22, 0.92);
-      backdrop-filter: blur(8px);
-    }
-    .choice-btn {
-      transition: all 0.18s ease;
-    }
-    .choice-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.35);
-    }
-    .choice-btn:active {
-      transform: translateY(0);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1 in 8,000 Thoroughbreds — 競走馬に産まれる人生</title>
+<meta name="description" content="年間約8,000頭が生まれるサラブレッド。デビュー率、勝ち上がり率、気性難、怪我、地方転厩、そして引退後のセカンドキャリアまでを統計データで歩む人生シミュレーター。">
+<meta property="og:title" content="1 in 8,000 Thoroughbreds — 競走馬に産まれる人生">
+<meta property="og:description" content="JRAで1勝できるのは約35%、G1馬は0.3%。あなたの馬はどんな生涯と二つ名を歩むのか？">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<style>
+  :root {
+    --bg: #0c120f;
+    --card: #151f1a;
+    --card-border: #283a31;
+    --accent: #3cb371;
+    --accent-hover: #4cd187;
+    --gold: #e5c158;
+    --danger: #e05a47;
+    --text: #eef2f0;
+    --muted: #8fa39a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    margin: 0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+  }
+  .container {
+    max-width: 680px;
+    width: 100%;
+  }
+  header {
+    text-align: center;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 1.45rem;
+    margin: 0 0 6px 0;
+    letter-spacing: 0.04em;
+    color: var(--gold);
+  }
+  .subtitle {
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .status-board {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    font-size: 0.88rem;
+  }
+  @media (max-width: 480px) {
+    .status-board { grid-template-columns: 1fr; }
+  }
+  .status-item span {
+    color: var(--muted);
+    font-size: 0.76rem;
+    display: block;
+    margin-bottom: 2px;
+  }
+  .status-item strong {
+    font-size: 1rem;
+    color: #fff;
+  }
+  .pedigree-box {
+    background: #101814;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    display: none;
+  }
+  .pedigree-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .log-container {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 250px;
+    margin-bottom: 16px;
+  }
+  .age-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #06110b;
+    font-weight: bold;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+  }
+  .event-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .event-text {
+    line-height: 1.75;
+    margin-bottom: 16px;
+    font-size: 0.94rem;
+  }
+  .camp-comment {
+    background: #0e1512;
+    border-left: 3px solid var(--gold);
+    padding: 10px 14px;
+    font-size: 0.86rem;
+    color: #d6e2dc;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .stat-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    border-top: 1px dashed var(--card-border);
+    padding-top: 10px;
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  button, .share-link-btn {
+    background: var(--accent);
+    color: #07120c;
+    border: none;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: background 0.2s, transform 0.05s;
+  }
+  button:hover, .share-link-btn:hover {
+    background: var(--accent-hover);
+  }
+  button:active, .share-link-btn:active {
+    transform: translateY(1px);
+  }
+  button.choice-btn {
+    background: #1e2d26;
+    color: var(--text);
+    border: 1px solid var(--accent);
+    text-align: left;
+  }
+  button.choice-btn:hover {
+    background: #273b32;
+  }
+  .x-share-btn {
+    background: #1d9bf0;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .x-share-btn:hover {
+    background: #35a9f7;
+  }
+  .result-card {
+    border: 2px solid var(--gold);
+    background: #101714;
+    padding: 18px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  .alias-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+  }
+  .title-badge {
+    color: var(--gold);
+    font-size: 1.35rem;
+    font-weight: bold;
+    margin: 4px 0 12px 0;
+    line-height: 1.35;
+  }
+  .umabashira-box {
+    background: #0a0f0d;
+    border: 1px solid var(--card-border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 12px 0;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #bfe3d0;
+    overflow-x: auto;
+  }
+  .jra-notice {
+    background: #18231e;
+    border-left: 4px solid var(--accent);
+    padding: 10px 12px;
+    font-size: 0.86rem;
+    margin: 12px 0;
+  }
+  footer {
+    border-top: 1px solid var(--card-border);
+    padding-top: 16px;
+    margin-top: 20px;
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: center;
+  }
+  footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  footer a:hover {
+    text-decoration: underline;
+  }
+</style>
 </head>
-<body class="p-3 sm:p-6 flex flex-col items-center">
-  <div class="w-full max-w-2xl">
-    <!-- Header -->
-    <header class="text-center mb-5 border-b border-emerald-900/70 pb-4">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-700/50 text-emerald-300 text-xs font-semibold mb-2">
-        <span>🏇 年間生産頭数 約8,000頭のリアル統計シミュレーター</span>
-      </div>
-      <h1 class="serif-title text-2xl sm:text-3xl font-extrabold tracking-wider gold-text">
-        1 in 8,000 Thoroughbreds
-      </h1>
-      <p class="text-xs sm:text-sm text-emerald-200/70 mt-1">
-        競走馬に産まれる人生 — 血統・気性難・怪我・地方転厩・障害・秋華賞とセカンドキャリア
-      </p>
-    </header>
+<body>
 
-    <!-- Main Status Dashboard -->
-    <section class="turf-card border border-emerald-800/70 rounded-2xl p-4 mb-4 shadow-xl">
-      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-900/80 pb-3 mb-3">
-        <div>
-          <span class="text-xs text-emerald-400/80 block">競走馬名 / 性別・毛色</span>
-          <div class="flex items-center gap-2 mt-0.5">
-            <span id="stName" class="text-lg sm:text-xl font-extrabold text-white">未誕生</span>
-            <span id="stSexCoat" class="text-xs px-2 py-0.5 rounded-md bg-emerald-900/80 text-emerald-200 border border-emerald-700/50">-</span>
-          </div>
-        </div>
-        <div class="text-right">
-          <span class="text-xs text-emerald-400/80 block">現在の年齢・所属クラス</span>
-          <span id="stClass" class="text-sm sm:text-base font-bold text-amber-300">ゲートイン待機中</span>
-        </div>
-      </div>
+<div class="container">
+  <header>
+    <h1>1 in 8,000 Thoroughbreds</h1>
+    <div class="subtitle">統計データで歩む「競走馬に産まれる人生」シミュレーター</div>
+  </header>
 
-      <!-- Mini Pedigree & Trait Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-        <div class="bg-black/35 rounded-xl p-2.5 border border-emerald-900/50">
-          <span class="text-emerald-400/80 block mb-0.5">血統・生産背景</span>
-          <strong id="stPedigree" class="text-emerald-100 block truncate">-</strong>
-        </div>
-        <div class="bg-black/35 rounded-xl p-2.5 border border-emerald-900/50">
-          <span class="text-emerald-400/80 block mb-0.5">気性 / 脚元体質</span>
-          <strong id="stTraits" class="text-emerald-100 block truncate">-</strong>
-        </div>
-        <div class="bg-black/35 rounded-xl p-2.5 border border-emerald-900/50">
-          <span class="text-emerald-400/80 block mb-0.5">適性 (馬場・距離)</span>
-          <strong id="stAptitude" class="text-emerald-100 block truncate">-</strong>
-        </div>
-        <div class="bg-black/35 rounded-xl p-2.5 border border-emerald-900/50">
-          <span class="text-emerald-400/80 block mb-0.5">通算戦績 / 総賞金</span>
-          <strong id="stRecord" class="text-amber-300 block truncate">0戦0勝 / 0万円</strong>
-        </div>
-      </div>
-    </section>
-
-    <!-- Event Card -->
-    <main class="turf-card border border-emerald-700/60 rounded-2xl p-5 sm:p-6 mb-4 shadow-2xl">
-      <div class="flex items-center justify-between gap-2 mb-3">
-        <span id="evPhase" class="px-3 py-1 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold tracking-wide">
-          PROLOGUE
-        </span>
-        <span id="evRarity" class="text-xs text-emerald-300/80 font-mono">
-          生存・到達率データ準拠
-        </span>
-      </div>
-
-      <h2 id="evTitle" class="serif-title text-xl sm:text-2xl font-bold text-white mb-3 leading-snug">
-        年間約8,000頭のサラブレッドが誕生します
-      </h2>
-
-      <div id="evBody" class="text-sm sm:text-base text-emerald-50/90 leading-relaxed space-y-3 mb-5">
-        <p>
-          日本ダービーや<strong>秋華賞</strong>のゲートに入れるのはわずか18頭（0.2〜0.4%）。JRAで1勝して生き残れるのは約35%。
-        </p>
-        <p>
-          生まれつきの<strong>「気性難」</strong>による暴走や去勢の決断、競走馬特有の<strong>「ソエ・喉鳴り・骨折・屈腱炎」</strong>といった試練、未勝利からの<strong>「地方競馬への転厩」</strong>や<strong>「障害レースへの転向」</strong>、そして引退後の<strong>「誘導馬・乗馬・種牡馬」</strong>へのセカンドキャリア……。
-        </p>
-        <p>
-          統計データに基づいた、あなただけの馬生が今始まります。
-        </p>
-      </div>
-
-      <!-- Camp Comment Box -->
-      <div id="evCommentBox" class="hidden bg-black/45 border-l-4 border-amber-400 rounded-r-xl p-3.5 mb-4 text-xs sm:text-sm text-emerald-100">
-        <div class="font-bold text-amber-300 mb-0.5" id="evSpeaker">陣営コメント</div>
-        <div id="evCommentText"></div>
-      </div>
-
-      <!-- Statistical Note -->
-      <div id="evStatBox" class="bg-emerald-950/70 border border-emerald-800/60 rounded-xl p-3 mb-5 text-xs text-emerald-300/90 flex items-start gap-2">
-        <span class="text-base leading-none">📊</span>
-        <span id="evStatText">JRA・地方競馬の血統登録頭数、3歳未勝利勝ち上がり率、引退馬進路統計をもとに分岐します。</span>
-      </div>
-
-      <!-- Action Buttons -->
-      <div id="actionButtons" class="flex flex-col gap-2.5">
-        <button onclick="startNewLife()" class="choice-btn w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg">
-          🐎 この世に誕生する（1/8000 ガチャを引く）
-        </button>
-      </div>
-    </main>
-
-    <!-- Career History Log -->
-    <section id="historySection" class="hidden turf-card border border-emerald-900/80 rounded-2xl p-4 mb-6">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400">📜 歩んできた馬生ログ（馬柱履歴）</h3>
-        <span id="logCount" class="text-xs text-emerald-400/70">0件</span>
-      </div>
-      <ul id="historyList" class="space-y-1.5 text-xs text-emerald-100/85 max-h-48 overflow-y-auto pr-1"></ul>
-    </section>
-
-    <!-- Footer -->
-    <footer class="text-center text-xs text-emerald-400/60 pb-8 pt-2 space-y-1">
-      <p>Inspired by <a href="https://1in8b.life/ja/" target="_blank" rel="noopener noreferrer" class="underline hover:text-emerald-300">1 in 8 Billion</a> | 統計モデル：JRA・地方競馬生産頭数および登録抹消データ参考</p>
-      <p>すべての引退馬に穏やかな余生を — <a href="https://rha.or.jp/" target="_blank" rel="noopener noreferrer" class="underline hover:text-emerald-300">認定NPO法人 引退馬協会</a> / <a href="https://www.tcc-japan.com/" target="_blank" rel="noopener noreferrer" class="underline hover:text-emerald-300">TCC Japan</a></p>
-    </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="hidden fixed bottom-5 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-full shadow-2xl z-50">
-      📋 戦績と称号をクリップボードにコピーしました！
-    </div>
+  <div class="status-board">
+    <div class="status-item"><span>馬名 / 性別・毛色</span><strong id="stName">誕生前</strong></div>
+    <div class="status-item"><span>所属 / 現在クラス</span><strong id="stClass">-</strong></div>
+    <div class="status-item"><span>気性 / 脚元体質 / 適性</span><strong id="stTrait">-</strong></div>
+    <div class="status-item"><span>通算戦績 / 総獲得賞金</span><strong id="stRecord">0戦0勝 / 0万円</strong></div>
   </div>
 
-  <script>
-    const CROWNS = ["ハルカ", "ミライ", "アカツキ", "ギンガ", "ヤマト", "ホマレ", "キセキ", "ツバサ", "シンプウ", "オーロラ", "グラン", "ネオ"];
-    const NAMES = ["インパクト", "スピリット", "クラウン", "オーシャン", "ブレード", "ワルツ", "ノヴァ", "ドリーム", "レジェンド", "メテオ", "フォース", "アリア"];
-    const SIRES = [
-      { name: "サンデーサイレンス系（王道芝）", turf: "芝◎", dist: "中距離" },
-      { name: "キングカメハメハ系（万能型）", turf: "芝・ダ兼", dist: "マイル〜中" },
-      { name: "ストームキャット系（早熟スピード）", turf: "ダート◎", dist: "短距離" },
-      { name: "ステイゴールド系（気性難・爆発力）", turf: "芝・重馬場◎", dist: "中長距離", tempBias: true },
-      { name: "パイロ・ゴールドアリュール系（地方・砂の鬼）", turf: "ダート◎", dist: "マイル" }
+  <div class="pedigree-box" id="pedigreeBox">
+    <strong>■ 血統・生産プロフィール</strong>
+    <div class="pedigree-grid" id="pedigreeGrid"></div>
+  </div>
+
+  <div class="log-container">
+    <div class="age-badge" id="ageBadge">GATE IN</div>
+    <div class="event-title" id="eventTitle">日本で年間約8,000頭が生まれるサラブレッド</div>
+    <div class="event-text" id="eventText">
+      そもそもデビューできる馬が約88%。JRAで3歳秋までに1勝できるのは約35%〜40%。そしてG1の頂に立てるのはわずか0.3%未満。<br><br>
+      気性難による暴走と去勢の決断、ソエや屈腱炎との戦い、地方競馬への転厩、障害レースへの挑戦、そして引退後のセカンドキャリア（種牡馬・繁殖・誘導馬・乗馬）……。あなたがどんな馬生と「二つ名」を刻むのか、ゲートを開けてみましょう。
+    </div>
+    <div class="camp-comment" id="campComment" style="display:none;"></div>
+    <div class="stat-note" id="statNote">統計モデル：国内サラブレッド生産頭数・勝ち上がり率・登録抹消統計に基づく推計シミュレーション</div>
+  </div>
+
+  <div class="choices" id="actionArea">
+    <button onclick="startGame()">この世に誕生する（1/8000ガチャを引く）</button>
+  </div>
+
+  <footer>
+    <div>Inspired by <a href="https://1in8b.life/ja/" target="_blank" rel="noopener noreferrer">1 in 8 Billion</a></div>
+    <div style="margin-top:6px;">
+      すべての引退馬に穏やかな余生を — 
+      <a href="https://rha.or.jp/" target="_blank" rel="noopener noreferrer">認定NPO法人 引退馬協会</a> / 
+      <a href="https://www.tcc-japan.com/" target="_blank" rel="noopener noreferrer">TCC Japan</a>
+    </div>
+    <div style="margin-top:8px; font-size:0.7rem; color:#6c8077;">
+      ※本アプリは個人のファンによる非公式の創作シミュレーションゲームであり、JRA・地方競馬全国協会・実在の牧場および上記支援団体とは一切関係ありません。作中の数値は統計をもとにした推計モデルです。
+    </div>
+  </footer>
+</div>
+
+<script>
+let horse = {};
+
+const prefixes = ["ミライ", "ハルカ", "キセキ", "ホマレ", "ヤマト", "ツバサ", "アカツキ", "ギンガ", "カゼノ", "ホシノ", "ユメノ", "オオゾラ"];
+const suffixes = ["インパクト", "オーシャン", "ノヴァ", "クラウン", "ドリーム", "スピリット", "ブレード", "ワルツ", "ティアーズ", "レジェンド", "カノン", "メテオ"];
+const sires = ["王道サンデー系種牡馬", "快速ミスプロ系種牡馬", "欧州スタミナ系種牡馬", "ダート剛腕系種牡馬", "快速スプリント系種牡馬"];
+const broodmareSires = ["重厚ロベルト系", "伝統ノーザンダンサー系", "スピード型ナスルーラ系", "名門サンデー系"];
+
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function prob(pct) { return Math.random() * 100 < pct; }
+
+function updateDashboard() {
+  document.getElementById("stName").innerText = `${horse.name} (${horse.sex}・${horse.coat})`;
+  document.getElementById("stClass").innerText = `${horse.affiliation} / ${horse.grade}`;
+  document.getElementById("stTrait").innerText = `気性:${horse.temperament} / 脚:${horse.legs} / ${horse.aptitude}`;
+  document.getElementById("stRecord").innerText = `${horse.runs}戦${horse.wins}勝(2着${horse.seconds}回) / ${horse.prize.toLocaleString()}万円`;
+
+  const pedBox = document.getElementById("pedigreeBox");
+  pedBox.style.display = "block";
+  document.getElementById("pedigreeGrid").innerHTML = `
+    <div>父：${horse.sire}</div>
+    <div>母父：${horse.bms}</div>
+    <div>生産：${horse.breeder}</div>
+    <div>セリ評価：${horse.priceText}</div>
+  `;
+}
+
+function showCard(age, title, text, comment, stat, buttons) {
+  document.getElementById("ageBadge").innerText = age;
+  document.getElementById("eventTitle").innerText = title;
+  document.getElementById("eventText").innerHTML = text;
+  const cEl = document.getElementById("campComment");
+  if (comment) {
+    cEl.style.display = "block";
+    cEl.innerText = comment;
+  } else {
+    cEl.style.display = "none";
+  }
+  document.getElementById("statNote").innerText = stat;
+
+  const area = document.getElementById("actionArea");
+  area.innerHTML = "";
+  buttons.forEach(b => {
+    if (b.isLink) {
+      const a = document.createElement("a");
+      a.href = b.href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.className = "share-link-btn x-share-btn";
+      a.innerText = b.label;
+      if (b.onClick) a.addEventListener("click", b.onClick);
+      area.appendChild(a);
+    } else {
+      const btn = document.createElement("button");
+      btn.innerText = b.label;
+      if (b.isChoice) btn.className = "choice-btn";
+      btn.onclick = b.action;
+      area.appendChild(btn);
+    }
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function startGame() {
+  const isMale = prob(50);
+  const coat = prob(1.5) ? "白毛(超希少)" : (prob(13) ? "芦毛" : rand(["鹿毛", "黒鹿毛", "栗毛", "青鹿毛", "尾花栗毛"]));
+
+  const tempRoll = Math.random();
+  let temperament = "素直";
+  if (tempRoll < 0.28) temperament = "激しい(気性難)";
+  else if (tempRoll < 0.58) temperament = "大人しい(穏やか)";
+
+  const legRoll = Math.random();
+  let legs = "丈夫";
+  if (legRoll < 0.28) legs = "やや繊細";
+  else if (legRoll < 0.68) legs = "平均的";
+
+  const breedRoll = Math.random() * 100;
+  let breeder = "日高の中堅牧場";
+  let priceText = "セール 1,800万円";
+  let ability = 52 + Math.floor(Math.random() * 24);
+
+  if (breedRoll < 10) {
+    breeder = "北海道の大手名門牧場（良血統）";
+    priceText = "セレクトセール 1億8,000万円";
+    ability = 72 + Math.floor(Math.random() * 25);
+  } else if (breedRoll > 82) {
+    breeder = "家族経営の小さな牧場";
+    priceText = "庭先取引 450万円";
+    ability = 44 + Math.floor(Math.random() * 28);
+  }
+
+  const aptitudes = ["芝・中距離", "芝・マイル", "ダート・短距離", "ダート・中距離", "芝・長距離"];
+
+  horse = {
+    name: rand(prefixes) + rand(suffixes),
+    sex: isMale ? "牡" : "牝",
+    coat: coat,
+    sire: rand(sires),
+    bms: rand(broodmareSires),
+    breeder: breeder,
+    priceText: priceText,
+    highPrice: breedRoll < 10,
+    temperament: temperament,
+    legs: legs,
+    aptitude: rand(aptitudes),
+    ability: ability,
+    runs: 0,
+    wins: 0,
+    seconds: 0,
+    prize: 0,
+    affiliation: "育成牧場",
+    grade: "誕生・育成期",
+    umabashira: [],
+    history: [],
+    gelded: false,
+    onsenReturn: false,
+    g1Winner: false,
+    shukaHeroine: false,
+    classicRunner: false,
+    jumpKing: false,
+    localIron: false
+  };
+
+  updateDashboard();
+  showCard(
+    "0歳 春",
+    `北の大地で誕生！「${horse.name}」と名付けられる`,
+    `年間約8,000頭が生まれるサラブレッドの1頭として、【${horse.breeder}】で産声を上げました。<br>
+     毛色は<b>${horse.coat}</b>の<b>${horse.sex}馬</b>。父は${horse.sire}、取引評価は【${horse.priceText}】です。<br>
+     生まれつきの気性は「<b>${horse.temperament}</b>」、脚元は「<b>${horse.legs}</b>」と診断されました。`,
+    `牧場スタッフ：「${horse.temperament.includes("激しい") ? "立ち上がるのが早くて気が強いぞ！乗り手の言うことを聞くか心配だな…" : (horse.temperament.includes("大人しい") ? "とても人懐っこくて優しい目をした仔馬だね。みんなに愛されそうだ。" : "母乳をしっかり飲んで、骨太でいい馬体に育っているよ。")}」`,
+    "【統計】国内で生まれるサラブレッドの約98%は北海道（日高・胆振・十勝など）で誕生します。",
+    [{ label: "1歳〜2歳：育成調教とデビュー判定へ", action: stepTwoYearOld }]
+  );
+}
+
+function stepTwoYearOld() {
+  if (horse.legs === "やや繊細" && prob(22)) {
+    horse.history.push("育成期にソエ・骨瘤を発症し地方デビューへ");
+    horse.affiliation = "地方競馬";
+    horse.grade = "地方2歳新馬";
+    updateDashboard();
+    showCard(
+      "2歳 春〜夏",
+      "育成期の試練…「ソエ（管骨骨膜炎）」と骨瘤でデビュー延期",
+      "坂路調教を強めたところで脚元に熱感と痛みが発生。JRAでの早期デビューを見送り、脚元に優しい地方競馬のダートからじっくりデビューすることになりました。",
+      "調教師：「素質はあるんだが、まだ骨が成長途中だ。焦らず地方からスタートしよう」",
+      "【統計】血統登録馬のうち約10%強は育成中のケガや体質面の問題で中央デビュー前に進路変更や未出走引退となります。",
+      [{ label: "2歳秋：地方競馬でのデビュー戦へ", action: stepLocalCareer }]
+    );
+    return;
+  }
+
+  if (prob(68) || horse.ability >= 68) {
+    horse.affiliation = "JRA（中央競馬）";
+    horse.grade = "JRA 2歳新馬";
+    updateDashboard();
+    showCard(
+      "2歳 夏〜秋",
+      "ゲート試験合格！JRAトレーニングセンターへ入厩",
+      `順調に育成をクリアし、中央競馬（JRA）でデビューが決まりました！<br>同期約4,500頭のライバルたちと「3歳秋までに1勝」を懸けたサバイバルが始まります。`,
+      `主戦騎手：「追い切りの動きは合格点！${horse.temperament.includes("激しい") ? "ただ、物見が激しくてゲート内で立ち上がる癖があるのが課題だね。" : "素直で折り合いがつきやすい優等生タイプだよ。"}」`,
+      "【統計】年間生産馬約8,000頭のうち、JRAでデビューできるのは約60%（約4,500〜4,800頭）です。",
+      [{ label: "2歳〜3歳春：新馬・未勝利戦へ挑む", action: stepJraThreeYearOld }]
+    );
+  } else {
+    horse.affiliation = "地方競馬";
+    horse.grade = "地方2歳";
+    updateDashboard();
+    showCard(
+      "2歳 秋",
+      "地方競馬（ダート路線）からキャリアをスタート",
+      "ダート適性や仕上がりの早さを買われ、地方競馬の厩舎へ入厩しました。砂を被るタフな実戦から賞金加算を目指します。",
+      "調教師：「ここで連勝して力をつければ、中央への挑戦や重賞戦線も見えてくるぞ！」",
+      "【統計】世代の約30%は地方競馬からデビューを果たします。",
+      [{ label: "地方での競走生活へ進む", action: stepLocalCareer }]
+    );
+  }
+}
+
+function stepJraThreeYearOld() {
+  // 気性難イベント
+  if (horse.temperament.includes("激しい")) {
+    horse.runs += 3;
+    horse.seconds += 1;
+    horse.prize += 310;
+    horse.umabashira.push("[2歳新馬 6着(出遅れ)]", "[未勝利 2着(かかり)]", "[未勝利 11着(暴走)]");
+    updateDashboard();
+
+    const choices = [
+      { label: "【決断】ブリンカーを着けて短距離戦へ一気に条件変更する", isChoice: true, action: () => resolveTemperament("blinker") }
     ];
-    const BMS_LIST = ["ミスプロ系", "ノーザンダンサー系", "ロベルト系", "トニービン系", "クロフネ系"];
-
-    let horse = {};
-
-    function pick(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
+    if (horse.sex === "牡") {
+      choices.push({ label: "【決断】種牡馬の道を断念し「去勢手術（セン馬化）」で気性を落ち着かせる", isChoice: true, action: () => resolveTemperament("geld") });
     }
+    choices.push({ label: "【決断】馬具や手術に頼らず、このまま調教で矯正して挑む", isChoice: true, action: () => resolveTemperament("keep") });
 
-    function roll(percent) {
-      return Math.random() * 100 < percent;
+    showCard(
+      "3歳 春",
+      "気性難が大爆発！パドックで暴れ、レースでは引っかかって失速",
+      "エンジンは素晴らしいのに、発走前に汗びっしょりで体力を消耗。ゲートが開くと騎手の制御を振り切って暴走してしまいます。3戦して未だ0勝。このままでは未勝利のまま終わってしまいます。",
+      "調教師：「能力は間違いなくオープン級なのに、自分との戦いに負けている。ここが陣営としての決断のしどころだ」",
+      "【統計】気性難の矯正のため、多くの競走馬が馬具の工夫や去勢手術（セン馬化）を経験します。",
+      choices
+    );
+    return;
+  }
+
+  // 喉鳴りイベント（低確率）
+  if (prob(16)) {
+    horse.runs += 2;
+    horse.prize += 180;
+    horse.umabashira.push("[2歳新馬 4着]", "[3歳未勝利 9着(呼吸音)]");
+    updateDashboard();
+    showCard(
+      "3歳 春",
+      "直線で突然の失速…競走馬の呼吸器疾患「喉鳴り（喘鳴症）」が判明",
+      "道中の手応えは抜群なのに、最後の直線に入るとヒューヒューと苦しそうな呼吸音がして止まってしまいます。獣医師の診断は『喉鳴り（喘鳴症）』でした。",
+      "獣医師：「喉の軟骨が気道を塞いでしまっています。手術をするか、息が持つ1200mの短距離に絞るかを選ばなければなりません」",
+      "【統計】喉鳴りや鼻出血などの呼吸器トラブルは、大柄な馬や良血馬にもしばしば発生する試練です。",
+      [
+        { label: "【選択】喉の手術（形成術）を受けて中距離路線を目指す", isChoice: true, action: () => { horse.ability += 6; horse.history.push("喉鳴り手術を乗り越える"); evaluateThreeYearOldMain(); } },
+        { label: "【選択】手術せず1200mスプリント路線へ電撃転向する", isChoice: true, action: () => { horse.aptitude = "芝・短距離スプリント"; horse.ability += 8; horse.history.push("喉鳴りを抱えつつ短距離路線へ転向"); evaluateThreeYearOldMain(); } }
+      ]
+    );
+    return;
+  }
+
+  evaluateThreeYearOldMain();
+}
+
+function resolveTemperament(type) {
+  if (type === "geld") {
+    horse.sex = "セン";
+    horse.gelded = true;
+    horse.temperament = "穏やか(去勢済)";
+    horse.ability += 14;
+    horse.history.push("3歳春に去勢手術を受けセン馬となる");
+  } else if (type === "blinker") {
+    horse.temperament = "集中(ブリンカー着用)";
+    horse.ability += 10;
+    horse.history.push("ブリンカー着用で気性難を克服");
+  } else {
+    horse.ability += 2;
+    horse.history.push("気性難と戦いながらレースを続行");
+  }
+  updateDashboard();
+  evaluateThreeYearOldMain();
+}
+
+function evaluateThreeYearOldMain() {
+  // エリート3歳G1ルート（秋華賞・ダービー・菊花賞）
+  if (horse.ability >= 76 && prob(65)) {
+    horse.classicRunner = true;
+    horse.runs += 5;
+    horse.wins += 3;
+    horse.seconds += 1;
+    horse.prize += 6800;
+    horse.grade = "JRA オープン（3歳クラシック戦線）";
+    horse.umabashira.push("[未勝利 1着]", "[1勝クラス 1着]", "[トライアル重賞 1着]");
+    updateDashboard();
+
+    if (horse.sex === "牝") {
+      showCard(
+        "3歳 10月（秋華賞・G1）",
+        "いざ3歳牝馬三冠最終戦！京都2000m『秋華賞（G1）』のゲートへ！",
+        `未勝利から破竹の3連勝でトライアル重賞を制覇！同世代の牝馬約4,000頭のうち、わずか18頭しか立てない秋の京都G1【秋華賞】へ駒を進めました！スタンドの大歓声が地鳴りのように響き渡ります。`,
+        `主戦騎手：「春からの成長力が凄まじい。今のこの仔なら、世代の頂点に手が届くはずだ！」`,
+        "【統計】世代の牝馬約4,000頭の中で、秋華賞（G1）のゲートに入れるのはわずか0.45%（18頭）です。",
+        [{ label: "発走！秋華賞（G1）の直線へ！", action: resolveClassicG1 }]
+      );
+    } else {
+      showCard(
+        "3歳 春〜秋（日本ダービー・菊花賞 G1）",
+        "世代8,000頭の頂点へ！3歳クラシックG1（ダービー・菊花賞）出走！",
+        `トライアルを見事に突破し、すべてのホースマンが夢見るクラシックG1の舞台へ！大観衆のファンファーレの中、運命のゲートが開きます。`,
+        `調教師：「一生に一度のクラシック舞台。ここまで無事にたどり着いてくれた馬に感謝したい」`,
+        "【統計】日本ダービーや菊花賞に出走できるのは、同世代約8,000頭のうちわずか18頭（0.2%）です。",
+        [{ label: "発走！クラシックG1の直線へ！", action: resolveClassicG1 }]
+      );
     }
+    return;
+  }
 
-    function addRaceColumn(raceName, place, pop) {
-      horse.raceColumns.push({ raceName, place, pop });
+  // 通常の3歳未勝利勝ち上がり判定（約38%）
+  horse.runs += 5;
+  if (horse.ability >= 60 && prob(55)) {
+    horse.wins += 1;
+    horse.seconds += 2;
+    horse.prize += 1250;
+    horse.grade = "JRA 1勝クラス";
+    horse.umabashira.push("[3歳未勝利 3着]", "[3歳未勝利 2着]", "[3歳未勝利 1着]");
+    horse.history.push("3歳未勝利サバイバルを勝ち上がる");
+    updateDashboard();
+    showCard(
+      "3歳 夏",
+      "歓喜の初勝利！JRA未勝利戦を勝ち上がる！",
+      "厳しい3歳未勝利戦のタイムリミットが迫る中、見事1着でゴール板を駆け抜けました！これでJRAでの現役続行が決まり、古馬戦線へとステップアップします。",
+      "騎手：「苦しい展開だったけど、最後まで耳を絞って抜かせなかった。勝負根性がある馬だよ！」",
+      "【統計】JRAデビュー馬のうち、3歳秋までに1勝できるのは約35%〜40%のみです。",
+      [{ label: "4歳〜6歳：古馬戦線（条件戦・重賞・障害）へ", action: stepOlderJra }]
+    );
+  } else {
+    // 3歳未勝利のまま9月終了
+    horse.seconds += 1;
+    horse.prize += 290;
+    horse.umabashira.push("[3歳未勝利 5着]", "[3歳未勝利 2着]", "[3歳未勝利 8着]");
+    updateDashboard();
+    showCard(
+      "3歳 9月",
+      "無情のタイムリミット…JRA未勝利のまま終戦",
+      `${horse.runs}戦して0勝。9月の3歳未勝利戦終了までに1勝を挙げることができませんでした。陣営は今後の馬生を左右する大きな決断を迫られます。`,
+      "馬主：「まだ3歳で馬体は若い。地方競馬へ移籍してダートで再起を図るか、それとも障害レースや乗馬の道を探るか…」",
+      "【統計】毎年約2,500頭以上の3歳馬がJRA未勝利のまま番組を失い、地方転厩か引退の岐路に立ちます。",
+      [
+        { label: "【選択】地方競馬へ転厩し、地方のダートから再起をかける", isChoice: true, action: stepTransferToLocal },
+        { label: "【選択】飛越センスに賭けて「JRA障害レース」へ転向する", isChoice: true, action: stepJumpCareer },
+        { label: "【選択】怪我がないうちに競走馬を引退し、セカンドキャリアを探す", isChoice: true, action: stepRetirement }
+      ]
+    );
+  }
+}
+
+function resolveClassicG1() {
+  horse.runs += 1;
+  if (prob(52)) {
+    horse.wins += 1;
+    horse.prize += 13000;
+    horse.g1Winner = true;
+    if (horse.sex === "牝") {
+      horse.shukaHeroine = true;
+      horse.umabashira.push("【秋華賞(G1) 1着】");
+      horse.history.push("3歳牝馬G1『秋華賞』を制覇");
+    } else {
+      horse.umabashira.push("【クラシックG1 1着】");
+      horse.history.push("3歳クラシックG1を制覇");
     }
+    horse.grade = "JRA G1ウィナー";
+    updateDashboard();
+    showCard(
+      "3歳 秋（G1制覇！）",
+      horse.sex === "牝" ? "淀に咲いた大輪の華！『秋華賞（G1）』制覇！！" : "世代8,000頭の頂点！クラシックG1制覇！！",
+      "最後の直線、外から豪快に突き抜けて先頭でゴール板を駆け抜けました！スタンドを埋め尽くす大観衆から拍手と歓声が巻き起こり、あなたの名前は競馬史に永遠に刻まれました！",
+      "実況：「外から一気に突き抜けたーっ！世代の頂点に立ったのは『" + horse.name + "』だーっ！！」",
+      "【統計】G1タイトルを手にできる競走馬は、同世代8,000頭のうちわずか0.2%〜0.3%の選ばれし存在です。",
+      [{ label: "4歳〜5歳：古馬王道路線へ進む", action: stepOlderJra }]
+    );
+  } else {
+    horse.seconds += 1;
+    horse.prize += 5200;
+    horse.umabashira.push(horse.sex === "牝" ? "【秋華賞(G1) 2着】" : "【クラシックG1 2着】");
+    horse.history.push("3歳G1でクビ差の2着に激走");
+    updateDashboard();
+    showCard(
+      "3歳 秋（G1激走2着）",
+      "大舞台でクビ差の2着！世代トップクラスの力を証明",
+      "勝ち馬にはあと一歩届かなかったものの、G1の大舞台で堂々の2着に激走！多くの競馬ファンの記憶に残る名勝負を演じました。",
+      "騎手：「悔しいけれど、本当に最後までよく詰め寄ってくれた。古馬になったら必ずビッグタイトルを獲れる馬です」",
+      "【統計】G1で連対（2着以内）に入るだけでも、世代上位0.5%に入る超エリートです。",
+      [{ label: "4歳〜5歳：古馬戦線へ進む", action: stepOlderJra }]
+    );
+  }
+}
 
-    function addHistory(age, text) {
-      horse.logs.unshift({ age, text });
-      const section = document.getElementById("historySection");
-      const list = document.getElementById("historyList");
-      const count = document.getElementById("logCount");
-      section.classList.remove("hidden");
-      count.textContent = `${horse.logs.length}件`;
-      list.innerHTML = horse.logs
-        .map(item => `<li class="border-b border-emerald-900/40 pb-1"><span class="text-amber-400 font-semibold mr-2">[${item.age}]</span>${item.text}</li>`)
-        .join("");
-    }
+function stepTransferToLocal() {
+  horse.affiliation = "地方競馬（園田・高知・南関）";
+  horse.grade = "地方C2クラス";
+  horse.history.push("3歳秋にJRA未勝利から地方競馬へ転厩");
+  updateDashboard();
+  stepLocalCareer();
+}
 
-    function updateDashboard() {
-      document.getElementById("stName").textContent = horse.name;
-      document.getElementById("stSexCoat").textContent = `${horse.sex}・${horse.coat}`;
-      document.getElementById("stClass").textContent = `${horse.ageLabel} / ${horse.affiliation}（${horse.className}）`;
-      document.getElementById("stPedigree").textContent = `父:${horse.sire.split("（")[0]} × 母父:${horse.bms}`;
-      document.getElementById("stTraits").textContent = `気性:${horse.temperament} / 脚:${horse.legs}`;
-      document.getElementById("stAptitude").textContent = `${horse.aptitude}・${horse.dist}`;
-      document.getElementById("stRecord").textContent = `${horse.runs}戦${horse.wins}勝 (2着${horse.seconds}) / ${horse.prize.toLocaleString()}万円`;
-    }
+function stepLocalCareer() {
+  // 地方から4連勝でJRA再転入サクセスルート
+  if (horse.ability >= 63 && prob(45)) {
+    horse.runs += 8;
+    horse.wins += 5;
+    horse.seconds += 2;
+    horse.prize += 2400;
+    horse.affiliation = "JRA再転入 / 地方交流戦線";
+    horse.grade = "JRA 2勝クラス（中央復帰）";
+    horse.umabashira.push("[地方C2 1着]", "[地方C1 1着]", "[地方B級 1着]", "[JRA再転入 1着]");
+    horse.history.push("地方で連勝を果たしJRAへ再転入（中央復帰）");
+    updateDashboard();
+    showCard(
+      "4歳〜5歳",
+      "地方の砂で完全覚醒！破竹の連勝でJRAへ奇跡の再転入！",
+      "地方競馬の水がピタリと合い、圧倒的なスピードで連勝街道を驀進！その実績を引っ提げて再びJRA（中央競馬）へ復帰し、見事に勝利を挙げました！",
+      "調教師：「地方で自信をつけて別馬のようにたくましくなった。見事なサクセスストーリーだよ」",
+      "【統計】3歳未勝利で地方へ移籍した馬のうち、連勝条件を満たしてJRAへ再転入を果たす馬も毎年存在します。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+    return;
+  }
 
-    function showCard({ phase, rarity, title, bodyHtml, speaker, comment, stat, buttons }) {
-      document.getElementById("evPhase").textContent = phase;
-      document.getElementById("evRarity").textContent = rarity;
-      document.getElementById("evTitle").textContent = title;
-      document.getElementById("evBody").innerHTML = bodyHtml;
+  // 地方での屈腱炎イベント
+  if (horse.legs === "やや繊細" && prob(35)) {
+    horse.runs += 12;
+    horse.wins += 2;
+    horse.seconds += 3;
+    horse.prize += 680;
+    horse.umabashira.push("[地方戦 1着]", "[地方戦 2着]", "[地方戦 1着(故障)]");
+    horse.history.push("地方で2勝を挙げるも屈腱炎を発症し引退");
+    updateDashboard();
+    showCard(
+      "4歳 冬",
+      "地方で2勝を挙げるも…無念の「浅屈腱炎」発症",
+      "地方のダートで懸命に走り2勝を挙げましたが、レース翌日に脚元に熱感と腫れが見つかり、不治の病とも呼ばれる『屈腱炎（エビ）』が判明しました。",
+      "調教師：「ここまで一生懸命走って馬主孝行をしてくれた。これ以上無理はさせられない、ゆっくり休ませよう」",
+      "【統計】脚元の故障は競走馬がターフを去る最大の要因のひとつです。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+    return;
+  }
 
-      const commentBox = document.getElementById("evCommentBox");
-      if (comment) {
-        commentBox.classList.remove("hidden");
-        document.getElementById("evSpeaker").textContent = speaker || "陣営コメント";
-        document.getElementById("evCommentText").textContent = comment;
-      } else {
-        commentBox.classList.add("hidden");
-      }
+  // 地方の鉄人ルート（無傷で70戦完走）
+  horse.runs += 68;
+  horse.wins += 6;
+  horse.seconds += 14;
+  horse.prize += 1650;
+  horse.localIron = true;
+  horse.grade = "地方B級（地方の鉄人）";
+  horse.umabashira.push("[高知C3 1着]", "[園田C1 2着]", "[地方戦 1着]", "[通算70戦完走]");
+  horse.history.push("大きな怪我なく地方で70戦以上をタフに走り抜く");
+  updateDashboard();
+  showCard(
+    "4歳〜7歳",
+    "雨の日も風の日も…地方のダートを70戦以上走り抜いた『地方の鉄人』！",
+    "派手なG1タイトルこそありませんでしたが、生まれつきの丈夫な体質を武器に、中2週のローテーションで70戦以上を一度も休まず完走！地元の競馬ファンから熱狂的に愛される名物馬となりました。",
+    "厩務員：「本当に頭が下がるくらいタフで真面目な馬だよ。10年間で一番の功労馬だ」",
+    "【統計】地方競馬では、徹底したケアのもとで通算70戦〜100戦以上を元気に走り抜く鉄人ホースが存在します。",
+    [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+  );
+}
 
-      document.getElementById("evStatText").textContent = stat;
+function stepJumpCareer() {
+  horse.affiliation = "JRA（障害競走路線）";
+  horse.runs += 10;
+  if (prob(55) || horse.ability >= 62) {
+    horse.wins += 4;
+    horse.seconds += 3;
+    horse.prize += 9800;
+    horse.jumpKing = true;
+    horse.grade = "JRA 障害J-G1王者";
+    horse.umabashira.push("[障害未勝利 1着]", "[障害OP 1着]", "【中山大障害(J-G1) 1着】");
+    horse.history.push("障害レースへ転向し、中山大障害(J-G1)を制覇");
+    updateDashboard();
+    showCard(
+      "4歳〜6歳（中山大障害 J-G1）",
+      "平地の挫折から大逆転！大竹柵を越えて『中山大障害（J-G1）』制覇！！",
+      "平地では勝てなかったものの、障害飛越の天性のセンスが開花！ついに高さ1.6mの大竹柵・大生垣を越える過酷な4100m戦【中山大障害（J-G1）】を制し、障害界の絶対王者に君臨しました！",
+      "障害騎手：「飛越がとにかく丁寧で着地がぶれない。人馬一体で勝ち取った最高のJ-G1タイトルです！」",
+      "【統計】平地で苦戦した馬が障害レースで才能を開花させ、長年にわたり活躍するドラマは競馬の大きな魅力です。",
+      [{ label: "栄光の引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  } else {
+    horse.wins += 1;
+    horse.seconds += 2;
+    horse.prize += 2100;
+    horse.grade = "JRA 障害オープン";
+    horse.umabashira.push("[障害未勝利 2着]", "[障害未勝利 1着]", "[障害OP 4着]");
+    horse.history.push("障害レースへ転向し1勝を挙げる");
+    updateDashboard();
+    showCard(
+      "4歳〜5歳",
+      "ハードルを越えて！障害未勝利戦で見事な勝利",
+      "厳しい飛越練習を重ね、障害レースで見事に勝利を掴み取りました！しかもこの「障害飛越の経験」が、引退後のセカンドキャリアで大きな武器になります。",
+      "調教師：「真面目に飛越をこなしてくれた。この経験があれば、引退後も馬術競技馬として引く手あまただろう」",
+      "【統計】障害競走を経験した馬は、引退後に障害馬術競技馬としての高い適性を持つことが知られています。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  }
+}
 
-      const btnArea = document.getElementById("actionButtons");
-      btnArea.innerHTML = "";
-      buttons.forEach(btn => {
-        const b = document.createElement(btn.href ? "a" : "button");
-        if (btn.href) {
-          b.href = btn.href;
-          b.target = "_blank";
-          b.rel = "noopener noreferrer";
-        }
-        if (btn.variant === "choice") {
-          b.className = "choice-btn w-full text-left py-3 px-4 rounded-xl bg-emerald-950/90 hover:bg-emerald-900 border border-emerald-500/60 text-emerald-100 font-semibold text-xs sm:text-sm flex items-center justify-between";
-          b.innerHTML = `<span>${btn.label}</span><span class="text-amber-400 font-bold ml-2">選択 →</span>`;
-        } else if (btn.variant === "secondary") {
-          b.className = "choice-btn block text-center w-full py-3 px-4 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-600 text-emerald-100 font-bold text-xs sm:text-sm";
-          b.textContent = btn.label;
-        } else {
-          b.className = "choice-btn block text-center w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 font-extrabold text-sm sm:text-base shadow-lg";
-          b.textContent = btn.label;
-        }
-        if (btn.onClick) {
-          b.onclick = btn.onClick;
-        }
-        btnArea.appendChild(b);
-      });
-    }
+function stepOlderJra() {
+  // 屈腱炎・馬の温泉リハビリイベント
+  if (prob(32)) {
+    horse.runs += 4;
+    horse.wins += 1;
+    horse.prize += 2200;
+    horse.umabashira.push("[古馬戦 1着]", "[特別戦 3着(屈腱炎発症)]");
+    updateDashboard();
+    showCard(
+      "4歳 秋",
+      "競走馬最大の試練…「浅屈腱炎（エビ）」を発症",
+      "順調にキャリアを重ねていた矢先、前脚の腱に損傷が見つかりました。復帰には福島県いわき市の「馬の温泉（競走馬リハビリテーションセンター）」を含む1年以上の長期休養が必要です。",
+      "調教師：「時間はかかるが、馬の温泉でじっくりケアすればもう一度ターフに戻れる可能性がある。どうする？」",
+      "【統計】JRAの競走馬リハビリテーションセンター（通称：馬の温泉）では、温泉療法やウォータートレッドミルによる復帰支援が行われています。",
+      [
+        { label: "【決断】1年半の「馬の温泉」リハビリを経て奇跡の復活を目指す", isChoice: true, action: stepOnsenComeback },
+        { label: "【決断】脚元を悪化させないよう、ここで現役を引退する", isChoice: true, action: stepRetirement }
+      ]
+    );
+    return;
+  }
 
-    function startNewLife() {
-      const isMale = roll(50);
-      const sireObj = pick(SIRES);
-      const bms = pick(BMS_LIST);
+  // 順調な古馬戦線
+  if (horse.ability >= 74 && prob(55)) {
+    horse.runs += 12;
+    horse.wins += 4;
+    horse.seconds += 3;
+    horse.prize += 14500;
+    horse.grade = horse.g1Winner ? "JRA G1ウィナー" : "JRA 重賞ウィナー";
+    horse.umabashira.push("[3勝クラス 1着]", "[オープン特別 1着]", "【G2重賞 1着】");
+    horse.history.push("古馬重賞戦線でタイトルを獲得");
+    updateDashboard();
+    showCard(
+      "4歳〜6歳",
+      "充実の古馬時代！重賞タイトルを制してターフの主役へ！",
+      "古馬になってさらに馬体が充実！厳しい重賞戦線で堂々と先頭を駆け抜け、1億円を超える賞金を稼ぎ出す名馬となりました。",
+      "騎手：「毎年力をつけてくれて、本当に頼もしいパートナーでした！」",
+      "【統計】JRAで重賞を勝てる馬は、世代8,000頭のうち上位約1%のみです。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  } else {
+    horse.runs += 16;
+    horse.wins += 2;
+    horse.seconds += 4;
+    horse.prize += 4600;
+    horse.grade = "JRA 2勝〜3勝クラス";
+    horse.umabashira.push("[1勝クラス 1着]", "[2勝クラス 2着]", "[2勝クラス 1着]", "[3勝クラス 4着]");
+    horse.history.push("JRA条件戦線で堅実に活躍");
+    updateDashboard();
+    showCard(
+      "4歳〜6歳",
+      "JRA条件戦線の名バイプレイヤーとして活躍",
+      "重賞には届かなかったものの、JRAの2勝・3勝クラスで長く安定した走りを見せ、関係者とファンに愛される競走生活を送りました。",
+      "調教師：「どんな相手でも自分の力は必ず出し切る、本当にエライ馬だったよ」",
+      "【統計】JRAで2勝以上を挙げられる馬は、世代全体の上位約15%〜20%です。",
+      [
+        { label: "このまま平地で現役を引退し、セカンドキャリアへ", action: stepRetirement },
+        { label: "【挑戦】新境地を求めて「障害レース」へ転向する", isChoice: true, action: stepJumpCareer }
+      ]
+    );
+  }
+}
 
-      let coat = pick(["鹿毛", "黒鹿毛", "栗毛", "青鹿毛"]);
-      if (roll(1.2)) coat = "白毛(超希少)";
-      else if (roll(12)) coat = "芦毛";
-      else if (roll(4)) coat = "尾花栗毛";
+function stepOnsenComeback() {
+  horse.runs += 3;
+  horse.onsenReturn = true;
+  if (prob(60)) {
+    horse.wins += 1;
+    horse.prize += 3800;
+    horse.umabashira.push("[休養500日(馬の温泉)]", "【復帰戦 1着(涙の勝利)】");
+    horse.history.push("1年半の温泉リハビリから復活勝利を挙げる");
+    updateDashboard();
+    showCard(
+      "6歳 春",
+      "500日ぶりのターフ…涙の復活勝利！！",
+      "「馬の温泉」での長いリハビリとスタッフの献身的なケアを乗り越え、500日ぶりの復帰戦で見事に1着でゴール！ウイニングランでは厩務員も騎手も涙を拭っていました。",
+      "厩務員：「よく無事に帰ってきてくれた…！今日という日を迎えられて本当に感無量です」",
+      "【統計】屈腱炎からの復帰勝利は再発リスクとの戦いであり、ホースマンにとって最も感動的な瞬間のひとつです。",
+      [{ label: "無事に引退・セカンドキャリアへ", action: stepRetirement }]
+    );
+  } else {
+    horse.seconds += 1;
+    horse.prize += 1100;
+    horse.umabashira.push("[休養450日(馬の温泉)]", "[復帰戦 2着]");
+    horse.history.push("長期休養から復帰し完走を果たす");
+    updateDashboard();
+    showCard(
+      "6歳 春",
+      "長いリハビリを乗り越え、無事にターフへ帰還！",
+      "1年以上の休養を経て再びレースに出走し、2着と好走！脚元が温存されているうちに、胸を張って第二の馬生へと進むことになりました。",
+      "調教師：「無事にゴール板を駆け抜けてくれただけで100点満点だ。いい余生を用意してやろう」",
+      "【統計】怪我から復帰して無事に引退できることは、セカンドキャリアの選択肢を広げる上でも重要です。",
+      [{ label: "引退・セカンドキャリア判定へ", action: stepRetirement }]
+    );
+  }
+}
 
-      let temperament = "普通";
-      const tempRoll = Math.random() * 100;
-      if (sireObj.tempBias || tempRoll < 32) {
-        temperament = "激しい(気性難)";
-      } else if (tempRoll < 62) {
-        temperament = "穏やか(大人しい)";
-      }
+function stepRetirement() {
+  let alias = "";
+  let jraDest = "";
+  let careerDesc = "";
+  let rarityText = "";
 
-      let legs = "丈夫";
-      const legRoll = Math.random() * 100;
-      if (legRoll < 28) legs = "虚弱(ソエ・骨折注意)";
-      else if (legRoll < 68) legs = "平均的";
+  // セカンドキャリアと「二つ名（称号）」の判定
+  if (horse.shukaHeroine) {
+    alias = "淀に咲いた秋華のヒロイン";
+    jraDest = "北海道の故郷牧場にて繁殖牝馬となる予定";
+    careerDesc = "秋華賞（G1）を制した歴史的名牝として故郷の牧場へ凱旋！広大な放牧地で仲間と過ごしながら、次世代のG1馬を産む偉大な母としての余生を歩んでいます。";
+    rarityText = "到達レアリティ：上位 0.2%（世代4,000頭の牝馬の頂点）";
+  } else if (horse.jumpKing) {
+    alias = "大竹柵を越えた不屈の絶対王者";
+    jraDest = "JRA競馬場にて誘導馬、または乗馬となる予定";
+    careerDesc = "平地の挫折から中山大障害（J-G1）制覇まで登り詰めた不屈のヒーロー！引退後はその知名度と落ち着いた飛越センスを活かし、競馬場の看板誘導馬として多くのファンに囲まれています。";
+    rarityText = "到達レアリティ：上位 0.1%（障害J-G1ウィナー）";
+  } else if (horse.g1Winner && horse.sex === "牡") {
+    alias = "血を未来へ繋ぐターフの覇王";
+    jraDest = "北海道のスタッドにて種牡馬となる予定";
+    careerDesc = "世代8,000頭の頂点に立ち、堂々の種牡馬入り！毎年100頭以上の繁殖牝馬を集める人気種牡馬として、自分の産駒がデビューする日を待っています。";
+    rarityText = "到達レアリティ：上位 0.3%（選ばれし種牡馬ルート）";
+  } else if (horse.affiliation.includes("障害")) {
+    alias = "華麗なる馬術界のエリートジャンパー";
+    jraDest = "乗馬クラブ（馬術競技連盟登録）にて競技馬となる予定";
+    careerDesc = "現役時代に培った障害飛越のテクニックが高く評価され、引退後はなんと【障害馬術競技馬】へ華麗に転身！国体や全日本馬術大会を目指すパートナーとして大活躍しています。";
+    rarityText = "到達レアリティ：上位 2.5%（障害競走経験馬ならではの特権ルート）";
+  } else if ((horse.coat.includes("芦毛") || horse.coat.includes("白毛") || horse.coat.includes("尾花栗毛") || horse.gelded || horse.temperament.includes("大人しい") || horse.temperament.includes("穏やか")) && !horse.temperament.includes("激しい") && prob(65)) {
+    alias = horse.highPrice && horse.wins <= 1 ? "1億8,000万円の高貴なる誘導馬" : "ターフを導く白き騎士（JRA誘導馬）";
+    jraDest = "JRA 東京・京都競馬場にて誘導馬となる予定";
+    careerDesc = `その美しい【${horse.coat}】の馬体と、「${horse.temperament}」という穏やかな性格がJRA職員の目に留まり、競馬場の【誘導馬】に大抜擢されました！G1のファンファーレを背に、後輩たちを安全にターフへと導いています。`;
+    rarityText = "到達レアリティ：上位 1.2%（気性の良さと見栄えで掴んだ最高のセカンドキャリア）";
+  } else if (horse.onsenReturn) {
+    alias = "不屈の温泉帰り・奇跡の復活馬";
+    jraDest = "観光牧場・引退馬支援牧場にて功労馬となる予定";
+    careerDesc = "屈腱炎と500日の「馬の温泉」リハビリを乗り越えた感動のストーリーが多くのファンの心を打ち、引退後は観光牧場の功労馬として大切に繋養されています。";
+    rarityText = "到達レアリティ：上位 3.0%（大怪我を乗り越えた感動ルート）";
+  } else if (horse.localIron) {
+    alias = "砂塵を70戦駆け抜けた地方の鉄人";
+    jraDest = "地方の乗馬クラブにて乗馬（功労馬）となる予定";
+    careerDesc = "大きな怪我ひとつなく70戦以上を走り抜いたタフさと真面目さが買われ、地元の乗馬クラブへ引き取られました。毎日たくさんのニンジンをもらって穏やかに暮らしています。";
+    rarityText = "到達レアリティ：上位 4.5%（無傷で走り抜いた馬主孝行の鉄人）";
+  } else if (horse.sex === "牝" && (horse.wins >= 1 || horse.highPrice)) {
+    alias = "北の大地へ帰還した良血の母";
+    jraDest = "北海道の生産牧場にて繁殖牝馬となる予定";
+    careerDesc = "現役生活を終え、生まれ故郷の北海道へ帰還して繁殖牝馬となりました。自分が叶えられなかった夢を仔馬に託し、穏やかな牧場生活を送っています。";
+    rarityText = "到達レアリティ：上位 15%（牝馬の繁殖入りルート）";
+  } else if (!horse.temperament.includes("激しい") || prob(55)) {
+    alias = horse.highPrice && horse.wins === 0 ? "1億8,000万円の超高級乗馬" : "子供たちに愛される乗馬クラブの先生";
+    jraDest = "全国の乗馬クラブ・ふれあい牧場にて乗馬となる予定";
+    careerDesc = "引退馬リトレーニングを経て、乗馬クラブの「先生」として第二の馬生をスタート！初心者や子供たちを背中に乗せて優しく歩く人気者として、幸せな余生を送っています。";
+    rarityText = "到達レアリティ：上位 35%（穏やかな気性が繋いだ安全なセカンドキャリア）";
+  } else {
+    alias = "ターフを去った名もなき疾風";
+    jraDest = "乗馬（登録抹消・用途変更）";
+    careerDesc = "競走馬登録を抹消された後、公式発表には「乗馬」と記されましたが、気性の激しさなどから引き取り手が見つからず、その後の詳しい消息は分からなくなりました……。<br><br>これが年間8,000頭が生まれるサラブレッドの統計の、もうひとつの現実です。現在、1頭でも多くの引退馬がセカンドキャリアへ進めるよう、引退馬支援団体によるリトレーニング活動が広がっています。";
+    rarityText = "統計の現実：毎年引退する約5,000頭のうち、多くの馬が厳しい余生の壁に直面します。";
+  }
 
-      const breederRoll = Math.random() * 100;
-      let breeder = "日高の中堅牧場（堅実血統）";
-      let baseAbility = 52 + Math.floor(Math.random() * 24);
-      let priceText = "北海道サマーセールにて1,400万円で落札";
+  horse.grade = "現役引退";
+  updateDashboard();
 
-      if (breederRoll < 10) {
-        breeder = "胆振の大手ノーザン系牧場（超良血）";
-        baseAbility = 70 + Math.floor(Math.random() * 25);
-        priceText = "セレクトセールにて1億8,000万円で落札！";
-      } else if (breederRoll > 82) {
-        breeder = "日高の家族経営牧場（マイナー血統）";
-        baseAbility = 44 + Math.floor(Math.random() * 26);
-        priceText = "セリでは主取り（売れ残り）となり、生産牧場所有で走ることに";
-      }
+  const umabashiraStr = horse.umabashira.join(" → ") || "[未出走]";
+  const historyList = horse.history.map(h => `<li>${h}</li>`).join("");
 
-      horse = {
-        name: pick(CROWNS) + pick(NAMES),
-        sex: isMale ? "牡" : "牝",
-        coat,
-        temperament,
-        legs,
-        breeder,
-        priceText,
-        isHighPrice: breederRoll < 10,
-        isUnsold: breederRoll > 82,
-        sire: sireObj.name,
-        bms,
-        aptitude: sireObj.turf,
-        dist: sireObj.dist,
-        ability: baseAbility,
-        ageLabel: "0歳〜1歳",
-        affiliation: "北海道・育成牧場",
-        className: "デビュー前",
-        runs: 0,
-        wins: 0,
-        seconds: 0,
-        prize: 0,
-        gelded: false,
-        blinker: false,
-        chronicDisease: null,
-        localTransferred: false,
-        returnedToJra: false,
-        steeplechase: false,
-        steeplechaseG1: false,
-        shukaShoWinner: false,
-        classicWinner: false,
-        g1Winner: false,
-        gradedWinner: false,
-        tendonRevival: false,
-        epithet: "",
-        tags: [],
-        logs: [],
-        raceColumns: []
-      };
+  const shareText = `【競走馬に産まれる人生】
+馬名：${horse.name}（${horse.sex}・${horse.coat}）
+称号：『${alias}』
+戦績：${horse.runs}戦${horse.wins}勝（獲得賞金 ${horse.prize.toLocaleString()}万円）
+軌跡：${umabashiraStr}
+進路：${jraDest}
+#競走馬に産まれる人生 #1in8000 #競馬 #秋華賞`;
 
-      document.getElementById("historyList").innerHTML = "";
-      addHistory("0歳春", `${breeder}にて誕生（${horse.sex}・${horse.coat}）`);
-      updateDashboard();
+  const pageUrl = window.location.href.startsWith("http") ? window.location.href : "https://matamune61-glitch.github.io/1in8000-horse/";
+  const xIntentUrl = `https://x.com/intent/post?text=${encodeURIComponent(shareText + "\n" + pageUrl)}`;
 
-      showCard({
-        phase: "0歳 春 〜 1歳：誕生・セリ市",
-        rarity: horse.coat.includes("白毛") ? "白毛誕生率: 約 0.05%" : "年間生産頭数: 約 7,800頭",
-        title: `北の大地で誕生！「${horse.name}」と名付けられる`,
-        bodyHtml: `
-          <p>あなたは<strong>【${horse.breeder}】</strong>で生まれた<strong>${horse.coat}の${horse.sex}馬</strong>です。${horse.priceText}。</p>
-          <p>父は<strong>${horse.sire}</strong>、母父は<strong>${horse.bms}</strong>。生まれつきの気性は<strong>「${horse.temperament}」</strong>、脚元の体質は<strong>「${horse.legs}」</strong>と診断されました。</p>
-        `,
-        speaker: "生産牧場スタッフ",
-        comment: horse.temperament.includes("激しい")
-          ? "立ち上がるのが早くて負けん気が強いけれど、普段から噛み癖や立ち上がる癖があって少し危なっかしい仔だね……。"
-          : horse.temperament.includes("穏やか")
-          ? "すごく人懐っこくて、手入れをしていても全く嫌がらない優等生だよ。みんなに愛される馬になるね。"
-          : "母乳をしっかり飲んで、放牧地でも元気に駆け回っています。無事にデビューを迎えてほしいですね。",
-        stat: "日本のサラブレッドの約98%は北海道（日高・胆振・十勝など）で誕生します。",
-        buttons: [
-          { label: "1歳秋〜2歳：育成調教・デビュー判定へ進む →", onClick: stepTwoYearOld }
-        ]
-      });
-    }
+  const resultHtml = `
+    <div class="result-card">
+      <div class="alias-label">▼ 獲得した二つ名（称号）</div>
+      <div class="title-badge">『${alias}』</div>
 
-    function stepTwoYearOld() {
-      horse.ageLabel = "2歳";
+      <div class="jra-notice">
+        <b>【競走馬登録抹消のお知らせ（風）】</b><br>
+        ${horse.name}号（${horse.sex}・父：${horse.sire}）は、競走馬登録を抹消いたしました。<br>
+        <b>■ 今後の進路：</b>${jraDest}
+      </div>
 
-      if (horse.legs.includes("虚弱") && roll(14)) {
-        horse.affiliation = "未出走引退";
-        horse.className = "競走馬未登録";
-        horse.tags.push("未出走引退");
-        addHistory("2歳春", "育成調教中に重度の屈腱炎・骨折を発症し未出走引退");
-        updateDashboard();
+      <div class="umabashira-box">
+        <b>■ 主な馬柱（戦績ログ）：</b><br>
+        ${umabashiraStr}
+      </div>
 
-        showCard({
-          phase: "2歳 春：デビュー前の試練",
-          rarity: "未出走引退率: 約 12%",
-          title: "ターフに立てず…育成調教中の重度故障で未出走引退",
-          bodyHtml: `
-            <p>坂路調教のペースを上げた矢先、生まれつき弱かった脚元に重度の故障が判明しました。</p>
-            <p>獣医師の診断により競走能力喪失と判定され、1度もレースのゲートに入ることなく競走馬としての道を断念することになりました。</p>
-          `,
-          speaker: "育成牧場長",
-          comment: "血統も良くて期待していただけに本当に悔しい……。ただ、命が助かっただけでも良しとしなければいけない。",
-          stat: "毎年生産される約8,000頭のうち、約10〜12%（800〜1,000頭）は怪我や能力不足により1度もデビューできずに引退します。",
-          buttons: [
-            { label: "引退後のセカンドキャリア判定へ →", onClick: stepSecondCareer }
-          ]
-        });
-        return;
-      }
+      <p style="font-size:0.92rem; line-height:1.7;">${careerDesc}</p>
 
-      if (horse.legs.includes("虚弱") && roll(45)) {
-        horse.ability -= 6;
-        horse.tags.push("ソエ・骨瘤歴");
-        addHistory("2歳夏", "ソエ（管骨骨膜炎）と骨瘤を発症しデビューが半年遅れる");
-      }
+      <div style="font-size:0.84rem; color:#cfe0d8; border-top:1px solid #283a31; padding-top:10px;">
+        <b>■ 歩んだ馬生の記録：</b>
+        <ul style="margin:6px 0 8px 0; padding-left:20px;">${historyList || "<li>ターフを懸命に駆け抜けた</li>"}</ul>
+        <b>■ 最終通算戦績：</b> ${horse.runs}戦 ${horse.wins}勝（2着${horse.seconds}回） / 総獲得賞金：${horse.prize.toLocaleString()}万円
+      </div>
+    </div>
+  `;
 
-      if (horse.ability >= 60 || roll(62)) {
-        horse.affiliation = "JRA（中央競馬）";
-        horse.className = "2歳新馬";
-        addHistory("2歳秋", "ゲート試験合格！JRA（中央競馬）でデビュー決定");
-        updateDashboard();
-
-        showCard({
-          phase: "2歳 秋：JRAデビュー決定",
-          rarity: "JRAデビュー到達率: 約 58%",
-          title: "美浦・栗東トレセンに入厩！華やかなJRAの舞台へ",
-          bodyHtml: `
-            <p>${horse.tags.includes("ソエ・骨瘤歴") ? "若駒特有の成長痛<strong>「ソエ（管骨骨膜炎）」</strong>で少し入厩が遅れましたが、" : "育成を順調にクリアし、"}無事ゲート試験に合格！中央競馬（JRA）でのデビューが決まりました。</p>
-            <p>しかしJRAの3歳未勝利戦は翌年9月で打ち切られます。それまでに<strong>1勝（勝ち上がり）</strong>できなければ中央の舞台から去らねばなりません。</p>
-          `,
-          speaker: "担当調教師",
-          comment: horse.temperament.includes("激しい")
-            ? "エンジンの回転数は高いんだが、パドックやゲートの中でカッカして暴れるのが課題だな。レースで自滅しなければいいが……。"
-            : "素直で扱いやすいし、追い切りの動きも水準以上。まずは無事に初勝利を目指そう。",
-          stat: "世代約8,000頭のうち、JRAでデビューできるのは約4,600頭。そのうち3歳秋までに1勝できるのは約35〜40%のみです。",
-          buttons: [
-            { label: "2歳冬〜3歳：JRA新馬・未勝利戦へ挑む →", onClick: stepJraThreeYearOld }
-          ]
-        });
-      } else {
-        horse.affiliation = "地方競馬";
-        horse.className = "地方2歳・3歳";
-        horse.localTransferred = true;
-        addHistory("2歳秋", "地方競馬（ダート路線）からデビュー");
-        updateDashboard();
-
-        showCard({
-          phase: "2歳 秋：地方競馬デビュー",
-          rarity: "地方デビュー率: 約 30%",
-          title: "地方競馬のダート路線からキャリアをスタート！",
-          bodyHtml: `
-            <p>ダート適性や脚元の負担を考慮され、地方競馬の厩舎からデビューすることが決まりました。</p>
-            <p>砂を被るタフな小回りコースで賞金を積み重ね、地方重賞や中央への挑戦を目指します。</p>
-          `,
-          speaker: "地方調教師",
-          comment: "地方はレース数が多くてタフさが求められる。コツコツ走って馬主さんに恩返ししていこうな。",
-          stat: "日本の競走馬の約3割は門別・南関東・園田・名古屋・高知・佐賀などの地方競馬からデビューします。",
-          buttons: [
-            { label: "3歳〜：地方競馬での競走生活へ →", onClick: stepLocalMidCareer }
-          ]
-        });
-      }
-    }
-
-    function stepJraThreeYearOld() {
-      horse.ageLabel = "3歳 春";
-
-      if (horse.temperament.includes("激しい")) {
-        horse.runs += 4;
-        horse.seconds += 1;
-        horse.prize += 360;
-        addRaceColumn("2歳新馬", "5着", "3番人気");
-        addRaceColumn("3歳未勝利", "2着", "2番人気");
-        addRaceColumn("3歳未勝利", "11着(暴走)", "1番人気");
-        addHistory("3歳春", "パドックでのイレ込み・道中の暴走（かかり）で4戦0勝と苦戦");
-        updateDashboard();
-
-        const choices = [
-          {
-            label: "🥽 ブリンカー（遮眼革）を着用し、1200mの短距離ダートへ転向する",
-            variant: "choice",
-            onClick: () => resolveTemperamentAction("blinker")
+  showCard(
+    "馬生の結末",
+    `「${horse.name}」の競走馬としての生涯が幕を閉じました`,
+    resultHtml,
+    null,
+    rarityText,
+    [
+      {
+        label: "🐦 X（旧Twitter）でこの馬生と称号をポストする",
+        isLink: true,
+        href: xIntentUrl,
+        onClick: () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText + "\n" + pageUrl).catch(() => {});
           }
-        ];
-        if (horse.sex === "牡") {
-          choices.push({
-            label: "✂️ 最終手段「去勢手術（セン馬にする）」を決断し、気性を落ち着かせる",
-            variant: "choice",
-            onClick: () => resolveTemperamentAction("geld")
-          });
         }
-        choices.push({
-          label: "🔥 気性の荒さは爆発力の裏返し！このまま中距離で勝負し続ける",
-          variant: "choice",
-          onClick: () => resolveTemperamentAction("keep")
-        });
-
-        showCard({
-          phase: "3歳 春：気性難の壁",
-          rarity: "気性難トラブル発生",
-          title: "素質はあるのに勝てない…！ゲート内で暴れ、道中は大逃げ失速",
-          bodyHtml: `
-            <p>新馬戦・未勝利戦と4戦走りましたが、パドックで激しく発汗して体力を消耗し、レースでも騎手の制止を振り切って暴走（かかり・逸走）してしまいます。</p>
-            <p>2着が1回あるものの未だ0勝。<strong>9月の未勝利戦終了（タイムリミット）</strong>が迫る中、陣営は大きな決断を迫られます。</p>
-          `,
-          speaker: "主戦騎手",
-          comment: "背中の感触は間違いなく上のクラスなんですが、とにかく真面目に走ってくれません！馬具で視界を制限するか、思い切って去勢するか……。",
-          stat: "牡馬が去勢（セン馬化）すると種牡馬になる道は閉ざされますが、気性が穏やかになり競走寿命や引退後の乗馬適性が大きく向上します。",
-          buttons: choices
-        });
-        return;
-      }
-
-      if (roll(25)) {
-        horse.runs += 3;
-        horse.prize += 180;
-        horse.chronicDisease = "喘鳴症（喉鳴り）・鼻出血";
-        horse.tags.push("喉鳴り歴");
-        addRaceColumn("2歳新馬", "4着", "5番人気");
-        addRaceColumn("3歳未勝利", "9着(喉鳴り)", "4番人気");
-        addHistory("3歳春", "レース後に「喉鳴り（喘鳴症）」が判明");
-        updateDashboard();
-
-        showCard({
-          phase: "3歳 春：呼吸器系の試練",
-          rarity: "競走馬の喉疾患: 約 10〜15%",
-          title: "直線で急に失速…競走馬の病「喉鳴り（喘鳴症）」が発覚",
-          bodyHtml: `
-            <p>道中はいい手応えだったのに、最後の直線でヒューヒューという苦しそうな呼吸音とともに失速。検査の結果、喉の軟骨が気道を塞ぐ<strong>「喘鳴症（喉鳴り）」</strong>と軽度の鼻出血が判明しました。</p>
-            <p>休養して喉の手術を受けるか、息が持つ1000m〜1200mの超短距離戦に活路を見出すか、選択を迫られます。</p>
-          `,
-          speaker: "獣医師・調教師",
-          comment: "手術をすれば呼吸は楽になるが、未勝利戦が終わる9月までに復帰ギリギリになるぞ。短距離でごまかしながら使う手もあるが……。",
-          stat: "喉鳴り（喘鳴症）や鼻出血は大型馬やスピード馬にも多く見られる競走馬特有の内部疾患です。",
-          buttons: [
-            {
-              label: "🏥 喉の形成手術を受け、夏の北海道シリーズでの復帰に賭ける",
-              variant: "choice",
-              onClick: () => {
-                horse.ability += 6;
-                addHistory("3歳夏", "喉の手術が成功し、呼吸が改善");
-                evaluateThreeYearSurvival();
-              }
-            },
-            {
-              label: "⚡ 手術せず、息が持つ「1000m〜1200m電撃スプリント路線」へ転向する",
-              variant: "choice",
-              onClick: () => {
-                horse.dist = "短距離◎";
-                horse.ability += 5;
-                addHistory("3歳夏", "短距離スプリント路線へ転向");
-                evaluateThreeYearSurvival();
-              }
-            }
-          ]
-        });
-        return;
-      }
-
-      horse.runs += 3;
-      horse.seconds += 1;
-      horse.prize += 320;
-      addRaceColumn("2歳新馬", "3着", "4番人気");
-      addRaceColumn("3歳未勝利", "2着", "2番人気");
-      evaluateThreeYearSurvival();
-    }
-
-    function resolveTemperamentAction(choice) {
-      if (choice === "geld") {
-        horse.sex = "セン";
-        horse.gelded = true;
-        horse.temperament = "穏やか(去勢済)";
-        horse.ability += 14;
-        horse.tags.push("セン馬(去勢)");
-        addHistory("3歳春", "去勢手術を受けセン馬となる。気性が別馬のように落ち着く");
-      } else if (choice === "blinker") {
-        horse.blinker = true;
-        horse.temperament = "集中(ブリンカー)";
-        horse.ability += 9;
-        horse.tags.push("ブリンカー着用");
-        addHistory("3歳春", "ブリンカー着用＆ダート短距離転向で集中力アップ");
-      } else {
-        if (roll(35)) {
-          horse.ability += 18;
-          horse.tags.push("破天荒な爆発力");
-          addHistory("3歳春", "荒々しい気性が爆発的な末脚へと昇華！");
-        } else {
-          horse.ability -= 8;
-          addHistory("3歳春", "気性難が収まらずゲート再審査となる");
-        }
-      }
-      updateDashboard();
-      evaluateThreeYearSurvival();
-    }
-
-    function evaluateThreeYearSurvival() {
-      horse.ageLabel = "3歳 秋";
-      horse.runs += 3;
-
-      if (horse.ability >= 80 && roll(52)) {
-        horse.wins += 3;
-        horse.seconds += 1;
-        horse.className = "JRA オープン";
-        horse.gradedWinner = true;
-
-        const isFilly = horse.sex === "牝";
-        const wonAutumnG1 = roll(48);
-
-        if (isFilly) {
-          addRaceColumn("3歳未勝利", "1着", "1番人気");
-          addRaceColumn("オークス(G1)", "3着", "4番人気");
-          addRaceColumn("ローズS(G2)", "1着", "2番人気");
-          if (wonAutumnG1) {
-            horse.wins += 1;
-            horse.prize += 24800;
-            horse.g1Winner = true;
-            horse.shukaShoWinner = true;
-            horse.tags.push("🏆 秋華賞(G1)制覇");
-            addRaceColumn("秋華賞(G1)", "1着", "1番人気");
-            addHistory("3歳10月", "京都2000m・牝馬三冠最終戦【秋華賞(G1)】を制覇！世代4,000頭の頂点へ！");
-          } else {
-            horse.prize += 11500;
-            horse.tags.push("🌸 秋華賞(G1)出走");
-            addRaceColumn("秋華賞(G1)", "2着", "3番人気");
-            addHistory("3歳10月", "トライアルを勝ち抜き牝馬三冠最終戦【秋華賞(G1)】に出走し2着と大健闘！");
+      },
+      {
+        label: "📋 戦績テキストをクリップボードにコピーする",
+        isChoice: true,
+        action: () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareText + "\n" + pageUrl);
+            alert("戦績テキストとURLをコピーしました！Xに貼り付けて投稿できます。");
           }
-          updateDashboard();
-
-          showCard({
-            phase: "3歳 10月：牝馬三冠最終戦「秋華賞（G1）」",
-            rarity: "同世代牝馬 約4,000頭のうちゲートに入れるのは18頭（上位 0.4%）",
-            title: wonAutumnG1
-              ? `【秋華賞（G1）制覇】京都のターフに輝くティアラ！3歳牝馬の頂点へ！`
-              : `【秋華賞（G1）2着】大観衆の京都競馬場！18頭の選ばれしゲートで激走！`,
-            bodyHtml: `
-              <p>春から夏にかけて才能が一気に開花！前哨戦のローズステークス（G2）を快勝し、同世代の牝馬約4,000頭が憧れる秋の大舞台<strong>『秋華賞（G1）』の18頭のゲート</strong>に立ちました！</p>
-              <p>${wonAutumnG1
-                ? "淀の坂を下り、最終直線で堂々と先頭へ！大観衆のボルテージが最高潮に達する中、見事<strong>1着でゴール板を駆け抜けG1タイトルを奪取</strong>しました！"
-                : "直線で猛烈な末脚を繰り出し、勝ち馬にあと一歩まで迫る<strong>秋華賞2着</strong>の大激走！世代屈指の実力牝馬として古馬戦線へと進みます。"}</p>
-            `,
-            speaker: "実況アナウンサー",
-            comment: wonAutumnG1
-              ? `「3歳牝馬の頂点は${horse.name}だーっ！秋華賞、見事な戴冠です！」`
-              : `「外から${horse.name}が猛然と追い込む！世代トップクラスの力を淀のターフで見せつけました！」`,
-            stat: "秋華賞が行われる10月は、3歳未勝利戦が終了し多くの同世代馬が地方転厩や引退を迎えた直後です。4,000頭の牝馬のうち秋華賞に出走できるのはわずか0.4%のみです。",
-            buttons: [
-              { label: "4歳〜6歳：古馬G1・重賞戦線へ進む →", onClick: stepOlderJraCareer }
-            ]
-          });
-          return;
-        } else {
-          addRaceColumn("3歳未勝利", "1着", "1番人気");
-          addRaceColumn("日本ダービー(G1)", "4着", "5番人気");
-          addRaceColumn("神戸新聞杯(G2)", "1着", "2番人気");
-          if (wonAutumnG1 && !horse.gelded) {
-            horse.wins += 1;
-            horse.prize += 28500;
-            horse.g1Winner = true;
-            horse.classicWinner = true;
-            horse.tags.push("🏆 菊花賞(G1)制覇");
-            addRaceColumn("菊花賞(G1)", "1着", "2番人気");
-            addHistory("3歳10月", "クラシック最終戦【菊花賞(G1)】を制覇！世代の頂点に立つ！");
-          } else {
-            horse.prize += 12000;
-            horse.tags.push("👑 クラシックG1出走");
-            addRaceColumn("菊花賞(G1)", "3着", "4番人気");
-            addHistory("3歳春〜秋", "日本ダービー・菊花賞のクラシック戦線に出走し好走！");
-          }
-          updateDashboard();
-
-          showCard({
-            phase: "3歳 春〜秋：日本ダービー＆菊花賞（G1）",
-            rarity: "世代上位 0.2% のクラシックエリート",
-            title: wonAutumnG1 && !horse.gelded
-              ? `【菊花賞（G1）制覇】3000mの死闘を制し、世代8,000頭の頂点へ！`
-              : `【日本ダービー・菊花賞出走】世代18頭しか立てない夢のクラシック舞台へ！`,
-            bodyHtml: `
-              <p>圧倒的な素質が開花！トライアル重賞を快勝し、同世代8,000頭のホースマンが夢見る<strong>日本ダービー・菊花賞（G1）のゲート</strong>に立ちました！</p>
-              <p>${wonAutumnG1 && !horse.gelded
-                ? "淀の3000mを完璧に立ち回り、直線で抜け出して<strong>悲願のG1タイトルを制覇！</strong>世代の王として古馬戦線へと進みます。"
-                : "大観衆の歓声を浴びながらターフを駆け抜け、堂々の掲示板入り！世代トップクラスの実力馬として古馬戦線へと進みます。"}</p>
-            `,
-            speaker: "主戦騎手",
-            comment: "18頭しか立てないクラシックの大舞台にこの馬と立てて誇らしいです。古馬になってもG1を十分に狙える器ですよ！",
-            stat: "世代約8,000頭のうち、日本ダービーや菊花賞に出走できるのはわずか18頭（約0.2%）だけです。",
-            buttons: [
-              { label: "4歳〜6歳：古馬G1・重賞戦線へ進む →", onClick: stepOlderJraCareer }
-            ]
-          });
-          return;
         }
+      },
+      {
+        label: "🔄 もう一度、別の馬として生まれ変わる（1/8000ガチャ）",
+        action: startGame
       }
-
-      if (horse.ability >= 61 && roll(62)) {
-        horse.wins += 1;
-        horse.seconds += 1;
-        horse.prize += 1100;
-        horse.className = "JRA 1勝クラス";
-        addRaceColumn("3歳未勝利", "1着", "2番人気");
-        addHistory("3歳夏", "3歳未勝利戦を見事1着で突破し、JRA残留を決める");
-        updateDashboard();
-
-        showCard({
-          phase: "3歳 夏〜秋：JRA勝ち上がり成功",
-          rarity: "JRA勝ち上がり率: 約 38%",
-          title: "念願の初勝利！過酷な3歳未勝利サバイバルを突破！",
-          bodyHtml: `
-            <p>タイムリミットが迫る3歳夏の未勝利戦。直線で馬群を割って抜け出し、<strong>見事1着でゴール板を駆け抜けました！</strong></p>
-            <p>同世代のトップホースたちが秋華賞や菊花賞へ向かう中、あなたもJRAデビュー馬の約6割が淘汰される厳しい壁を乗り越え、中央競馬で4歳以降も走り続ける権利を掴み取りました。</p>
-          `,
-          speaker: "調教師",
-          comment: "まずは1つ勝ててホッとしたよ！これで焦らずこの馬のペースで上のクラスを目指せる。",
-          stat: "JRAでデビューした約4,600頭のうち、3歳9月の未勝利戦終了までに1勝以上できるのは約1,700〜1,800頭（約38%）のみです。",
-          buttons: [
-            { label: "4歳〜6歳：JRA古馬条件戦〜重賞戦線へ →", onClick: stepOlderJraCareer }
-          ]
-        });
-      } else {
-        horse.prize += 210;
-        addRaceColumn("3歳未勝利", "6着", "5番人気");
-        addRaceColumn("3歳未勝利(最終)", "4着", "4番人気");
-        addHistory("3歳9月", "JRA未勝利のまま番組終了（0勝）");
-        updateDashboard();
-
-        showCard({
-          phase: "3歳 9月：未勝利戦のタイムリミット",
-          rarity: "JRA未勝利淘汰: 約 62%",
-          title: "無情の秋…秋華賞・菊花賞の裏でJRA未勝利戦が終了",
-          bodyHtml: `
-            <p>${horse.runs}戦して0勝。世間が秋のG1シーズン（秋華賞・菊花賞）で盛り上がる裏で、9月の第1週をもって3歳未勝利戦が終了し、平地での出走枠を失いました。</p>
-            <p><strong>地方競馬へ転厩</strong>してダートで再起を図るか、<strong>障害レース（ハードル飛越）へ転向</strong>して一発逆転を狙うか、ここで<strong>現役を引退</strong>するか、陣営の決断が下されます。</p>
-          `,
-          speaker: "馬主・調教師",
-          comment: "平地のスピード勝負ではあと一歩足りなかったが、地方の小回りダートや、飛越センスを活かした障害レースなら化ける可能性があるぞ。",
-          stat: "毎年秋にはJRA未勝利に終わった約2,000頭以上の3歳馬が登録を抹消され、地方移籍・障害転向・乗馬への転用を迎えます。",
-          buttons: [
-            {
-              label: "🚚 地方競馬へ転厩し、地方の砂で再起（中央再転入）を目指す",
-              variant: "choice",
-              onClick: () => {
-                horse.affiliation = "地方競馬（転厩組）";
-                horse.className = "地方C2クラス";
-                horse.localTransferred = true;
-                addHistory("3歳10月", "JRA未勝利から地方競馬へ転厩");
-                stepLocalMidCareer();
-              }
-            },
-            {
-              label: "🚧 障害レース（中山大障害・J-G1路線）へ転向し、飛越の才能に賭ける",
-              variant: "choice",
-              onClick: () => {
-                horse.affiliation = "JRA（障害路線）";
-                horse.className = "障害未勝利";
-                horse.steeplechase = true;
-                horse.tags.push("障害レース転向");
-                addHistory("3歳10月", "平地から障害レース（ハードル）へ転向し障害試験合格");
-                stepSteeplechaseCareer();
-              }
-            },
-            {
-              label: "🌿 傷が浅いうちに現役を引退し、乗馬・誘導馬の道を探す",
-              variant: "choice",
-              onClick: () => {
-                addHistory("3歳10月", "3歳未勝利終了に伴い現役引退を選択");
-                stepSecondCareer();
-              }
-            }
-          ]
-        });
-      }
-    }
-
-    function stepSteeplechaseCareer() {
-      horse.ageLabel = "4歳〜7歳";
-      horse.runs += 14;
-
-      if (roll(52) || horse.ability >= 58) {
-        horse.wins += 4;
-        horse.seconds += 3;
-        horse.prize += 11800;
-        horse.steeplechaseG1 = true;
-        horse.gradedWinner = true;
-        horse.className = "障害オープン（J-G1馬）";
-        horse.tags.push("🏆 中山大障害(J-G1)制覇");
-        addRaceColumn("障害未勝利", "1着", "2番人気");
-        addRaceColumn("東京ジャンプS", "1着", "1番人気");
-        addRaceColumn("中山大障害(J-G1)", "1着", "1番人気");
-        addHistory("4歳〜6歳", "障害レースで才能が完全覚醒！大生垣を越えて【中山大障害(J-G1)】を制覇！");
-        updateDashboard();
-
-        showCard({
-          phase: "4歳〜6歳：障害界の絶対王者へ！",
-          rarity: "オジュウチョウサン級の奇跡（障害J-G1制覇）",
-          title: "平地未勝利からの大逆転！大竹柵を越え『中山大障害（J-G1）』制覇！",
-          bodyHtml: `
-            <p>障害コースへ転向した途端、天性の<strong>「飛越センス」と「無尽蔵のスタミナ」</strong>が開花！</p>
-            <p>高さ1.6mの大竹柵や深い谷を華麗に飛び越え、4100mの過酷な<strong>『中山大障害（J-G1）』を見事1着でゴールイン！</strong>スタンド中から温かい拍手が鳴り響く、障害界のヒーローとなりました！</p>
-          `,
-          speaker: "障害専門騎手",
-          comment: "平地では勝てなかった馬が、竹柵を飛ぶ時だけは翼が生えたみたいに伸びるんです。最高のジャンパーですよ！",
-          stat: "平地で頭打ちになった馬が障害競走で才能を開花させ、1億円以上を稼ぐスターホースになるケースは競馬ファンから熱く支持されます。",
-          buttons: [
-            { label: "引退後のセカンドキャリア判定へ →", onClick: stepSecondCareer }
-          ]
-        });
-      } else {
-        horse.wins += 1;
-        horse.seconds += 3;
-        horse.prize += 2600;
-        horse.className = "障害オープン";
-        addRaceColumn("障害未勝利", "1着", "3番人気");
-        addRaceColumn("障害OP", "3着", "4番人気");
-        addHistory("4歳〜5歳", "障害未勝利を突破し、ジャンパーとしてJRAで2,600万円を稼ぐ");
-        updateDashboard();
-
-        showCard({
-          phase: "4歳〜5歳：不屈のハードラーとして活躍",
-          rarity: "障害勝ち上がり達成",
-          title: "ハードルを飛んで掴んだJRA初勝利！障害オープンで奮闘",
-          bodyHtml: `
-            <p>過酷な飛越練習を乗り越え、<strong>障害未勝利戦で見事JRA初勝利</strong>を挙げました！</p>
-            <p>その後も障害オープンで堅実に走り、引退後の馬術競技馬としても高い適性を示すジャンパーとして活躍しました。</p>
-          `,
-          speaker: "担当調教師",
-          comment: "飛越が綺麗で真面目な馬だから、引退後も馬術競技の障害馬として引っ張りだこになるぞ。",
-          stat: "障害レースを経験し飛越技術を身につけた馬は、引退後に乗馬クラブや馬術競技（障害馬術）へ進みやすいという強みがあります。",
-          buttons: [
-            { label: "引退後のセカンドキャリア判定へ →", onClick: stepSecondCareer }
-          ]
-        });
-      }
-    }
-
-    function stepLocalMidCareer() {
-      horse.ageLabel = "4歳〜6歳";
-
-      if (horse.ability >= 63 && roll(45)) {
-        horse.runs += 14;
-        horse.wins += 5;
-        horse.seconds += 4;
-        horse.prize += 2450;
-        horse.affiliation = "JRA再転入 / 地方重賞";
-        horse.className = "JRA 1勝〜2勝クラス";
-        horse.returnedToJra = true;
-        horse.tags.push("地方から中央出戻り");
-        addRaceColumn("園田C2", "1着", "1番人気");
-        addRaceColumn("園田C1", "1着", "1番人気");
-        addRaceColumn("JRA 1勝C", "1着", "3番人気");
-        addHistory("4歳〜5歳", "地方で破竹の4連勝！JRAへ再転入し中央でも勝利を挙げる！");
-        updateDashboard();
-
-        showCard({
-          phase: "4歳〜5歳：地方での覚醒とJRA再転入！",
-          rarity: "中央再転入＆勝利達成（上位 約10%）",
-          title: "地方のダートで4連勝！念願のJRA再転入（出戻り）を果たす！",
-          bodyHtml: `
-            <p>地方の小回りダートコースが水を得た魚のようにフィット！みるみるうちに連勝を重ね、規定の勝利数をクリアして<strong>再びJRA（中央競馬）への返り咲き</strong>を果たしました！</p>
-            <p>再転入後のJRA1勝クラスでも見事勝利を挙げ、挫折から這い上がったサクセスホースとしてファンを沸かせました。</p>
-          `,
-          speaker: "担当厩務員",
-          comment: "一度は中央で勝てずに地方へ出た馬が、たくましくなって帰ってきてJRAで勝つんだから涙が出たよ。",
-          stat: "JRA未勝利で地方へ移籍した馬でも、地方で2〜3勝以上を挙げるとJRAへ再転入（出戻り）できる制度があります。",
-          buttons: [
-            { label: "引退・セカンドキャリア判定へ →", onClick: stepSecondCareer }
-          ]
-        });
-      } else {
-        const extraRuns = 38 + Math.floor(Math.random() * 35);
-        const extraWins = 3 + Math.floor(Math.random() * 5);
-        horse.runs += extraRuns;
-        horse.wins += extraWins;
-        horse.seconds += Math.floor(extraRuns * 0.18);
-        horse.prize += extraWins * 180 + extraRuns * 18;
-        horse.affiliation = "地方競馬（高知・園田）";
-        horse.className = "地方B級・鉄人";
-        horse.tags.push(`地方通算${horse.runs}戦の鉄人`);
-        addRaceColumn("地方C2", "1着", "2番人気");
-        addRaceColumn("地方B3", "2着", "3番人気");
-        addRaceColumn("一発逆転ファイナル", "1着", "5番人気");
-        addHistory("4歳〜7歳", `地方競馬で怪我なく通算${horse.runs}戦${horse.wins}勝を走り抜く`);
-        updateDashboard();
-
-        showCard({
-          phase: "4歳〜7歳：地方競馬の「鉄人」として愛される",
-          rarity: "地方長期勤続ホース",
-          title: `雨の日もナイターの日も…地方で通算${horse.runs}戦を無事に完走！`,
-          bodyHtml: `
-            <p>中央復帰こそなりませんでしたが、地方競馬のナイターや重馬場をものともせず、<strong>通算${horse.runs}戦${horse.wins}勝</strong>という驚異的なタフネスぶりを発揮しました！</p>
-            <p>「最終レースの一発逆転ファイナル」などでもたびたび馬券に絡み、全国の地方競馬ファンから愛される名物ホースとして現役を全うしました。</p>
-          `,
-          speaker: "地方競馬の実況アナウンサー",
-          comment: `「今日も元気にパドックを周回しています、${horse.name}！これで通算${horse.runs}戦目、本当に頭が下がる鉄人ぶりです！」`,
-          stat: "高知競馬や園田競馬などでは、徹底したケアのもとで通算50戦〜100戦以上を怪我なく走り抜くタフな競走馬たちが活躍しています。",
-          buttons: [
-            { label: "引退・セカンドキャリア判定へ →", onClick: stepSecondCareer }
-          ]
-        });
-      }
-    }
-
-    function stepOlderJraCareer() {
-      horse.ageLabel = "4歳〜6歳";
-
-      if ((horse.legs.includes("虚弱") && roll(45)) || roll(25)) {
-        horse.runs += 8;
-        horse.wins += 1;
-        horse.seconds += 2;
-        horse.prize += 2600;
-        horse.chronicDisease = "浅屈腱炎（エビ）";
-        horse.tags.push("屈腱炎発症");
-        addRaceColumn("1勝クラス", "1着", "2番人気");
-        addRaceColumn("2勝クラス", "2着", "3番人気");
-        addHistory("4歳冬", "2勝クラス好走後に「浅屈腱炎（エビ）」を発症");
-        updateDashboard();
-
-        showCard({
-          phase: "4歳 冬：ターフの爆弾「浅屈腱炎」発症",
-          rarity: "屈腱炎発症リスク: 約 15〜20%",
-          title: "さらなる飛躍を目前に…不治の病とも呼ばれる『浅屈腱炎』が判明",
-          bodyHtml: `
-            <p>1勝クラスを突破し、さらなる上のクラスが見えてきた矢先、レース翌日に前脚の腱が弓のように腫れ上がる<strong>「浅屈腱炎（通称：エビ）」</strong>が判明しました。</p>
-            <p>全治は1年以上。福島県の「競走馬リハビリテーションセンター（馬の温泉）」で長期療養して復活を目指すか、馬体が綺麗なうちに引退させるかの選択です。</p>
-          `,
-          speaker: "担当調教師",
-          comment: "せっかく力をつけてきたところなのに悔しいな……。1年半休ませて温泉治療で復帰を目指すか、ここで乗馬への道を探すか、どうするかだ。",
-          stat: "浅屈腱炎は完治までに1年〜1年半以上を要し、復帰しても再発リスクが高い競走馬最大の職業病です。",
-          buttons: [
-            {
-              label: "♨️ 福島・いわきの競走馬リハビリ施設（馬の温泉）で1年半療養し復帰に賭ける",
-              variant: "choice",
-              onClick: () => {
-                if (roll(48)) {
-                  horse.runs += 5;
-                  horse.wins += 1;
-                  horse.prize += 2100;
-                  horse.tendonRevival = true;
-                  horse.tags.push("屈腱炎から復活勝利");
-                  addRaceColumn("2勝C(復帰戦)", "1着", "6番人気");
-                  addHistory("6歳秋", "1年半の休養から奇跡の復活勝利を挙げる！");
-                } else {
-                  horse.runs += 2;
-                  addRaceColumn("2勝C(復帰戦)", "7着", "8番人気");
-                  addHistory("6歳秋", "1年半の療養を経て復帰出走を果たし、無事に引退");
-                }
-                stepSecondCareer();
-              }
-            },
-            {
-              label: "🌿 再発リスクを避け、ここで現役を引退してセカンドキャリアへ進む",
-              variant: "choice",
-              onClick: () => {
-                addHistory("4歳冬", "屈腱炎発症に伴い、大事を取って現役引退");
-                stepSecondCareer();
-              }
-            }
-          ]
-        });
-        return;
-      }
-
-      if (horse.ability >= 78 && roll(48)) {
-        horse.runs += 16;
-        horse.wins += 5;
-        horse.seconds += 4;
-        horse.prize += 24500;
-        horse.className = "JRA オープン（G1・重賞馬）";
-        horse.gradedWinner = true;
-        if (roll(48)) {
-          horse.g1Winner = true;
-          horse.prize += 32000;
-          horse.wins += 2;
-          horse.tags.push("🏆 古馬G1制覇");
-          addRaceColumn("G2重賞", "1着", "1番人気");
-          addRaceColumn("有馬記念(G1)", "1着", "2番人気");
-          addHistory("4歳〜5歳", "大観衆の古馬G1レースを制覇！歴史に名を刻む名馬となる！");
-        } else {
-          horse.tags.push("🏆 JRA重賞馬");
-          addRaceColumn("3勝クラス", "1着", "1番人気");
-          addRaceColumn("G3重賞", "1着", "2番人気");
-          addHistory("4歳〜5歳", "JRA重賞（G2/G3）を制覇しオープン馬として活躍！");
-        }
-        updateDashboard();
-
-        showCard({
-          phase: "4歳〜6歳：選ばれし重賞ウィナーの栄光",
-          rarity: horse.g1Winner ? "G1制覇率: 上位 0.2%" : "JRA重賞制覇率: 上位 1.2%",
-          title: horse.g1Winner
-            ? `【G1制覇】大観衆のターフを突き抜け、世代8,000頭の頂点へ！`
-            : `【JRA重賞制覇】ファンファーレが鳴り響く中、念願の重賞タイトルを獲得！`,
-          bodyHtml: `
-            <p>古馬になって本格化！厳しい条件戦を次々と突破し、ついに大舞台で<strong>${horse.g1Winner ? "G1タイトル" : "JRA重賞タイトル"}</strong>を掴み取りました！</p>
-            <p>グッズやぬいぐるみが発売されるほどの人気馬となり、惜しまれつつターフに別れを告げる日がやってきました。</p>
-          `,
-          speaker: "実況アナウンサー",
-          comment: `「先頭は${horse.name}だ！堂々と抜け出してゴールイン！見事な重賞制覇です！」`,
-          stat: "世代約8,000頭の中でJRA重賞を1つでも勝てる馬は約80〜100頭（約1.2%）、G1を勝てるのは約15〜20頭（約0.2%）のみです。",
-          buttons: [
-            { label: "栄光の引退式・セカンドキャリアへ →", onClick: stepSecondCareer }
-          ]
-        });
-      } else {
-        horse.runs += 21;
-        horse.wins += 2;
-        horse.seconds += 5;
-        horse.prize += 5600;
-        horse.className = "JRA 3勝クラス（準OP）";
-        horse.tags.push("JRA堅実派");
-        addRaceColumn("1勝クラス", "1着", "2番人気");
-        addRaceColumn("2勝クラス", "1着", "3番人気");
-        addRaceColumn("3勝クラス", "2着", "4番人気");
-        addHistory("4歳〜6歳", "JRAの2勝・3勝クラスで長く活躍し5,000万円超を稼ぐ");
-        updateDashboard();
-
-        showCard({
-          phase: "4歳〜6歳：JRA条件戦の功労馬",
-          rarity: "JRA 3勝到達（上位 約8%）",
-          title: "重賞には届かずとも…JRAのターフで6,000万円超を稼ぐ大健闘！",
-          bodyHtml: `
-            <p>オープンの壁は厚かったものの、2勝クラス・3勝クラス（準オープン）で何度も好走し、馬主や厩舎を支える<strong>「最高の善戦マン」</strong>として6歳まで走り抜きました。</p>
-            <p>ここで無事に引退させるか、最後のタイトルを狙って<strong>障害レース（ハードル）へ転向</strong>するかの選択肢もあります。</p>
-          `,
-          speaker: "担当調教師",
-          comment: "G1馬だけが名馬じゃない。こうやって大きな怪我もなく毎年しっかり走って賞金を持ってきてくれる馬が一番ありがたいんだよ。",
-          stat: "JRAで3勝（準オープン）まで到達できる馬は世代全体の上位約7〜8%に入るエリートです。",
-          buttons: [
-            { label: "🌿 無事に現役を引退し、セカンドキャリア判定へ →", onClick: stepSecondCareer },
-            {
-              label: "🚧 もう一花咲かせるため「障害レース」へ転向して重賞を狙う！",
-              variant: "choice",
-              onClick: () => {
-                horse.steeplechase = true;
-                horse.tags.push("古馬で障害転向");
-                stepSteeplechaseCareer();
-              }
-            }
-          ]
-        });
-      }
-    }
-
-    function determineEpithet(careerBadge) {
-      if (horse.shukaShoWinner) return "『淀に咲いた秋華のヒロイン』";
-      if (horse.steeplechaseG1) return "『大竹柵を越えた不屈の絶対王者』";
-      if (horse.tendonRevival) return "『不屈の温泉帰り・奇跡の復活馬』";
-      if (careerBadge.includes("誘導馬") && (horse.coat.includes("白毛") || horse.coat.includes("芦毛"))) {
-        return "『ターフを導く白き騎士（誘導馬）』";
-      }
-      if (careerBadge.includes("誘導馬") && horse.gelded) {
-        return "『気性難から更生した愛され誘導馬』";
-      }
-      if (horse.isHighPrice && horse.wins === 0) return "『1億8,000万円の高貴なる乗馬』";
-      if (horse.isUnsold && horse.g1Winner) return "『主取り（売れ残り）からのG1下剋上』";
-      if (horse.g1Winner) return "『1/8000の頂点・世代の覇王』";
-      if (horse.returnedToJra) return "『地方の砂から蘇った出戻りヒーロー』";
-      if (horse.runs >= 45) return `『ナイターを駆け抜けた地方の鉄人（${horse.runs}戦）』`;
-      if (horse.gradedWinner) return "『ファンファーレに愛された重賞ウィナー』";
-      if (horse.prize >= 5000) return "『厩舎を支えた愛すべき善戦マン』";
-      if (careerBadge.includes("乗馬") || careerBadge.includes("神事")) return "『ニンジン大好き・第二の馬生の優等生』";
-      if (careerBadge.includes("繁殖")) return "『夢を次世代へ託す北の大地の母』";
-      return "『1/8000のリアルを駆け抜けたサラブレッド』";
-    }
-
-    function stepSecondCareer() {
-      horse.ageLabel = "引退後";
-      let careerTitle = "";
-      let careerBadge = "";
-      let officialDest = "";
-      let careerStory = "";
-      let rarityText = "";
-
-      const isGoodLooking = horse.coat.includes("芦毛") || horse.coat.includes("白毛");
-      const isCalm = horse.temperament.includes("穏やか") || horse.temperament.includes("普通") || horse.gelded;
-
-      if (horse.gradedWinner && !horse.gelded) {
-        if (horse.sex === "牡") {
-          careerBadge = "👑 種牡馬（スタッド入り）";
-          officialDest = "北海道・日高スタッドにて種牡馬となる予定";
-          careerTitle = "血を未来へ繋ぐ「種牡馬」として北海道へ凱旋！";
-          careerStory = `現役時代の輝かしい重賞実績が評価され、故郷・北海道の種馬場で<strong>【種牡馬】</strong>となりました！毎年多くの繁殖牝馬を集め、3年後にはあなたの血を受け継いだ仔馬たちが再びターフを駆け抜けます。`;
-          rarityText = "上位 0.4%（同世代の牡馬4,000頭のうち種牡馬になれるのはわずか30頭前後）";
-        } else {
-          careerBadge = "🌸 名門牧場の繁殖牝馬";
-          officialDest = "北海道・生産牧場にて繁殖牝馬となる予定";
-          careerTitle = "重賞・G1ウィナーの母として故郷の牧場へ帰還！";
-          careerStory = `重賞を制した実績と血統が高く評価され、生まれ故郷の牧場で<strong>【繁殖牝馬】</strong>となりました。広い放牧地で仲間の牝馬たちと穏やかに草を食みながら、未来の秋華賞馬・ダービー馬を育てるお母さんとして大切にされています。`;
-          rarityText = "上位 1.5%（重賞実績を持って繁殖入りしたエリート牝馬）";
-        }
-      } else if ((isGoodLooking && isCalm) || (horse.gelded && isCalm && roll(65)) || (isCalm && horse.prize >= 2500 && roll(45))) {
-        careerBadge = "🎀 競馬場の誘導馬（大人気）";
-        officialDest = "JRA京都・東京競馬場にて誘導馬となる予定";
-        careerTitle = `競馬場の【誘導馬】に大抜擢！ファンファーレを背に歩む第二の馬生`;
-        careerStory = `その<strong>「${horse.coat}」の見栄えの良さ</strong>と、<strong>「${horse.temperament}」という落ち着いた優しい性格</strong>が競馬場職員の目に留まり、なんと<strong>【誘導馬】</strong>として採用されました！<br>現役時代には届かなかったG1の大舞台でも、今ではタキシード姿の職員を背に乗せ、後輩の競走馬たちを安全にターフへと導く人気者として幸せに暮らしています。`;
-        rarityText = "希少ルート（上位 約0.8%：見栄えと穏やかな気性・去勢が導いた最高のセカンドキャリア）";
-      } else if (horse.sex === "牝" && (horse.wins >= 1 || horse.breeder.includes("大手"))) {
-        careerBadge = "🌿 故郷で繁殖牝馬";
-        officialDest = "北海道の生産牧場にて繁殖牝馬となる予定";
-        careerTitle = "生まれ故郷の北海道へ戻り、お母さんになる";
-        careerStory = `現役生活を終え、北海道の生産牧場へ戻って<strong>【繁殖牝馬】</strong>となりました。自分が果たせなかった大きな夢を仔馬たちに託し、穏やかな牧場の風の中で余生を過ごしています。`;
-        rarityText = "上位 約18%（牝馬は1勝の実績や血統背景があると牧場へ戻れる確率が高まります）";
-      } else if (isCalm || horse.steeplechase || horse.wins >= 2 || roll(58)) {
-        if (horse.steeplechase) {
-          careerBadge = "🏅 馬術競技馬（障害馬術エリート）";
-          officialDest = "馬術連盟公認クラブにて障害馬術競技馬となる予定";
-          careerTitle = "障害レースの飛越センスを活かし、国民スポーツ大会・馬術競技のスターへ！";
-          careerStory = `現役時代に磨いたハードル飛越のテクニックが高く評価され、引退後は<strong>【障害馬術競技馬】</strong>へと転身！大学馬術部や競技大会でパートナーと共に数々のリボン（入賞）を獲得し、大切にケアされながら暮らしています。`;
-          rarityText = "障害転向ボーナス（飛越ができる馬は乗馬・馬術界で非常に重宝されます）";
-        } else if (roll(35)) {
-          careerBadge = "⛩️ 伝統神事・観光牧場の看板馬";
-          officialDest = "福島県・観光牧場（相馬野馬追・流鏑馬供用）にて乗馬となる予定";
-          careerTitle = "相馬野馬追や流鏑馬（やぶさめ）、観光牧場の愛されホースへ！";
-          careerStory = `引退後、観光牧場へと引き取られました。普段は訪れるファンからニンジンをもらう看板馬として愛され、年に一度の伝統神事では甲冑をまとった武者を背に乗せて勇壮に駆け抜けています。`;
-          rarityText = "セカンドキャリア確立（気性の良さと丈夫な馬体が評価されました）";
-        } else {
-          careerBadge = "🥕 乗馬クラブの優しい先生";
-          officialDest = "引退馬支援提携・全国乗馬倶楽部にて乗馬となる予定";
-          careerTitle = "リトレーニングを経て、乗馬クラブの人気インストラクター馬へ！";
-          careerStory = `引退馬支援プログラムを経て全国の<strong>【乗馬クラブ】</strong>へ。最初は「速く走らなくていいんだよ」と教わるリトレーニングから始め、今では子供や初心者を背に乗せてゆっくり歩く優しい先生として、毎日リンゴやニンジンをもらっています。`;
-          rarityText = "セカンドキャリア確立（穏やかな気性や去勢手術が安全な余生へと繋がりました）";
-        }
-      } else {
-        careerBadge = "📉 用途変更（消息不明）";
-        officialDest = "乗馬（書類上の登録・その後の行方不明）";
-        careerTitle = "登録抹消・用途変更……統計が語るサラブレッドのシビアな現実";
-        careerStory = `競走馬登録を抹消された後、書類上は「乗馬」と記されましたが、${horse.temperament.includes("激しい") ? "気性の荒さから人を乗せる乗馬への転用が難しく、" : ""}${horse.chronicDisease ? `「${horse.chronicDisease}」の後遺症もあり、` : ""}引き取り手が見つからないままその後の消息は分からなくなりました……。<br><br><span class="text-xs text-emerald-200/80">※年間約8,000頭が生まれ、毎年約5,000頭以上が引退するサラブレッドの世界では、すべての馬が天寿を全うできるわけではありません。現在、JRAや地方競馬、TCC・引退馬協会などの支援団体により、1頭でも多くの引退馬を乗馬や功労馬へ繋ぐ取り組みが続けられています。</span>`;
-        rarityText = "統計の現実ルート（気性難や故障、未勝利が重なるとセカンドキャリアのハードルは高くなります）";
-      }
-
-      horse.className = careerBadge;
-      horse.epithet = determineEpithet(careerBadge);
-      addHistory("引退後", `最終キャリア：${careerBadge}`);
-      updateDashboard();
-
-      const columnsHtml = horse.raceColumns.length
-        ? horse.raceColumns.slice(-5).map(rc => {
-            const isWin = rc.place === "1着";
-            const bgClass = isWin ? "bg-amber-500/25 border-amber-400 text-amber-200" : "bg-black/50 border-emerald-800/80 text-emerald-100";
-            return `
-              <div class="flex-shrink-0 w-24 rounded-lg border ${bgClass} p-2 text-center">
-                <div class="text-[10px] opacity-80 truncate">${rc.raceName}</div>
-                <div class="text-sm font-black my-0.5 ${isWin ? "text-amber-300" : "text-white"}">${rc.place}</div>
-                <div class="text-[10px] opacity-70">${rc.pop}</div>
-              </div>
-            `;
-          }).join("")
-        : `<div class="text-xs text-emerald-400/80 py-2">未出走引退（出走記録なし）</div>`;
-
-      const tagsHtml = horse.tags.length
-        ? horse.tags.map(t => `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs">${t}</span>`).join(" ")
-        : `<span class="text-xs text-emerald-400">真面目に完走</span>`;
-
-      const summaryHtml = `
-        <div class="bg-gradient-to-b from-slate-900 to-emerald-950 border-2 gold-border rounded-2xl p-4 sm:p-5 mb-4 shadow-2xl">
-          <div class="flex items-center justify-between border-b border-emerald-800/80 pb-2 mb-3">
-            <span class="text-[11px] font-bold tracking-widest text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded border border-amber-400/30">
-              📋 競走馬登録抹消・馬生リザルト証明
-            </span>
-            <span class="text-[11px] text-emerald-300/70 font-mono">1 in 8,000</span>
-          </div>
-
-          <div class="text-center my-3 py-2.5 px-3 rounded-xl bg-black/50 border border-amber-500/40">
-            <div class="text-[11px] text-emerald-300/80">獲得二つ名（称号）</div>
-            <div class="serif-title text-lg sm:text-xl font-black gold-text tracking-wide mt-0.5">${horse.epithet}</div>
-            <div class="text-sm font-bold text-white mt-1">${horse.name} <span class="text-xs font-normal text-emerald-300">（${horse.sex}・${horse.coat} / 父:${horse.sire.split("（")[0]}）</span></div>
-          </div>
-
-          <div class="mb-3">
-            <div class="text-[11px] text-emerald-400 font-bold mb-1.5">📰 主な出走履歴（馬柱ダイジェスト）</div>
-            <div class="flex gap-2 overflow-x-auto pb-1">
-              ${columnsHtml}
-            </div>
-          </div>
-
-          <div class="bg-black/40 rounded-xl p-3 border border-emerald-800/70 mb-3">
-            <div class="text-xs text-amber-300 font-bold mb-0.5">【引退後の進路】 ${careerBadge}</div>
-            <div class="text-[11px] text-emerald-300/80 mb-2">抹消発表：${officialDest}</div>
-            <p class="text-xs sm:text-sm text-emerald-50/95 leading-relaxed">${careerStory}</p>
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs bg-black/30 rounded-xl p-2.5 border border-emerald-900/50">
-            <div><span class="text-emerald-400">通算戦績：</span><strong>${horse.runs}戦 ${horse.wins}勝</strong> (2着${horse.seconds}回)</div>
-            <div><span class="text-emerald-400">総獲得賞金：</span><strong class="gold-text">${horse.prize.toLocaleString()}万円</strong></div>
-            <div><span class="text-emerald-400">気性・脚元：</span>${horse.temperament} / ${horse.legs}</div>
-            <div><span class="text-emerald-400">出身：</span>${horse.breeder.split("（")[0]}</div>
-          </div>
-
-          <div class="mt-2.5 pt-2 border-t border-emerald-900/60 text-xs flex flex-wrap items-center gap-1">
-            <span class="text-emerald-400 mr-1">特徴タグ：</span> ${tagsHtml}
-          </div>
-        </div>
-      `;
-
-      const xIntentUrl = `https://x.com/intent/post?text=${encodeURIComponent(buildShareText())}`;
-
-      showCard({
-        phase: "EPILOGUE：馬生の結末",
-        rarity: rarityText,
-        title: careerTitle,
-        bodyHtml: summaryHtml,
-        speaker: null,
-        comment: null,
-        stat: rarityText,
-        buttons: [
-          {
-            label: "🐦 X（旧Twitter）でこの馬生と称号をポストする（ワンタップ）",
-            href: xIntentUrl,
-            onClick: () => copyShareResult(true)
-          },
-          {
-            label: "📋 結果テキストをクリップボードにコピーする",
-            variant: "secondary",
-            onClick: () => copyShareResult(false)
-          },
-          {
-            label: "🔄 もう一度、別のサラブレッドとして生まれ変わる（1/8000ガチャ）",
-            variant: "secondary",
-            onClick: startNewLife
-          }
-        ]
-      });
-    }
-
-    function buildShareText() {
-      const colSummary = horse.raceColumns.length
-        ? horse.raceColumns.slice(-4).map(c => `[${c.raceName}:${c.place}]`).join("→")
-        : "[未出走]";
-      const publicUrl = (window.location.href && window.location.href.startsWith("http") && !window.location.href.includes("scf.usercontent.goog") && !window.location.href.includes("blob:"))
-        ? `\n${window.location.href}`
-        : "";
-      return [
-        `🐎 1 in 8,000 — 競走馬に産まれる人生`,
-        `称号：${horse.epithet}`,
-        `馬名：${horse.name}（${horse.sex}・${horse.coat}）`,
-        `戦績：${horse.runs}戦${horse.wins}勝（獲得賞金：${horse.prize.toLocaleString()}万円）`,
-        `軌跡：${colSummary}`,
-        `最終進路：${horse.className}`,
-        `#競走馬に産まれる人生 #秋華賞 #競馬${publicUrl}`
-      ].join("\n");
-    }
-
-    function copyShareResult(isFromXButton) {
-      const shareText = buildShareText();
-      const textarea = document.createElement("textarea");
-      textarea.value = shareText;
-      document.body.appendChild(textarea);
-      textarea.select();
-      try {
-        document.execCommand("copy");
-        const toast = document.getElementById("toast");
-        toast.textContent = isFromXButton
-          ? "📋 戦績をコピーしつつXの投稿画面を開きました！"
-          : "📋 戦績と称号をクリップボードにコピーしました！";
-        toast.classList.remove("hidden");
-        setTimeout(() => toast.classList.add("hidden"), 3500);
-      } catch (e) {
-        console.error(e);
-      }
-      document.body.removeChild(textarea);
-    }
-  </script>
+    ]
+  );
+}
+</script>
 </body>
 </html>
